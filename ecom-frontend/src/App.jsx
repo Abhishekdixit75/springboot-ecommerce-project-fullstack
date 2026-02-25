@@ -6,6 +6,7 @@ function App() {
     <>
       <h1 class="flex items-center justify-center h-screen text-4xl font-bold">
         Hello world!
+        
       </h1>
     </>
   )
