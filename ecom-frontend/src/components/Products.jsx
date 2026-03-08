@@ -10,7 +10,7 @@ const Products = () => {
         productName: "iPhone 14 Pro Max",
         image: "https://placehold.co/600x400",
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        quantity: 0,
+        quantity: 10,
         price: 12345.0,
         discount: 10.0,
         specialPrice: 12334.0,
