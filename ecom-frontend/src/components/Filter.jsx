@@ -67,10 +67,10 @@ const Filter = () => {
 
 	const toggleSortOrder = () => {
 		setSortOrder((prev) => {
-			const newOrder = prev === "asc" ? "desc" : "asc";
-			params.set("sortby", newOrder);
+			const newSortOrder = prev === "asc" ? "desc" : "asc";
+			params.set("sortby", newSortOrder);
 			navigate(`${pathname}?${params}`);
-			return newOrder;
+			return newSortOrder;
 		});
 	};
 
@@ -80,7 +80,8 @@ const Filter = () => {
 
 	return (
 		<div className="flex lg:flex-row flex-col-reverse lg:justify-between items-center gap-4">
-			{/* SEARCH BAR */}
+		
+        	{/* SEARCH BAR */}
 			<div className="relative flex items-center 2xl:w-[450px] sm:w-[420px] w-full">
 				<input
 					type="text"
@@ -115,7 +116,8 @@ const Filter = () => {
 						))}
 					</Select>
 				</FormControl>
-
+                
+                {/* SORT BY SELECTION */}
 				<Tooltip
 					title={
 						sortOrder === "asc" ? "Sorted by price:asc" : "Sorted by price:desc"
@@ -136,6 +138,8 @@ const Filter = () => {
 						)}
 					</Button>
 				</Tooltip>
+
+                {/* CLEARING FILTERS */}
 				<button
 					onClick={handleClearFilter}
 					className="flex items-center gap-2 bg-rose-900 text-white px-3 py-2 rounded-md transition duration-300 ease-in shadow-md focus:outline-none"
