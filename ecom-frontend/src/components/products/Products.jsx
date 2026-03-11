@@ -1,18 +1,21 @@
 import {MdDescription} from "react-icons/md";
-import ProductCard from "./ProductCard";
+import ProductCard from "../shared/ProductCard";
 import {FaExclamationTriangle} from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect} from "react";
 // import {fetchProducts} from "../store/actions";
 import Filter from "./Filter";
-import useProductFilter from "./useProductFilter";
-import {fetchCategories} from "../store/actions";
-import Loader from "./Loader";
+import useProductFilter from "../../hooks/useProductFilter";
+import {fetchCategories} from "../../store/actions";
+import Loader from "../shared/Loader";
+import Paginations from "../shared/Paginations";
 
 const Products = () => {
 	const {isLoading, errorMessage} = useSelector((state) => state.errors);
 
-	const {products, categories} = useSelector((state) => state.products);
+	const {products, categories, pagination} = useSelector(
+		(state) => state.products,
+	);
 	const dispatch = useDispatch();
 	useProductFilter();
 
@@ -38,11 +41,16 @@ const Products = () => {
 						{products &&
 							products.map((item, i) => <ProductCard key={i} {...item} />)}
 					</div>
+					<div className="flex justify-center pt-10">
+						<Paginations
+							numberOfPages={pagination?.totalPages}
+							totalProducts={pagination?.totalElements}
+						/>
+					</div>
 				</div>
 			)}
 		</div>
 	);
-	
 };
 
 export default Products;

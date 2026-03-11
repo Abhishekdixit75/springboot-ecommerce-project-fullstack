@@ -24,9 +24,14 @@ export const productReducer = (state = initialState, action) => {
             return {
                 ...state,
                 categories: action.payload,
+                pageNumber: action.pageNumber,
+                pageSize: action.pageSize,
+                totalPages: action.totalPages,
+                totalElements: action.totalElements,
+                lastPage: action.lastPage
             }
-            
-            default:
-                return state;
+
+        default:
+            return state;
     };
 };
