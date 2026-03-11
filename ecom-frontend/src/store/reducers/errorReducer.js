@@ -1,6 +1,8 @@
 const initialState = {
     isLoading: false,
     errorMessage: null,
+    categoryLoader: false,
+    categoryError: null,
 };
 
 const errorReducer = (state = initialState, action) => {
@@ -24,6 +26,21 @@ const errorReducer = (state = initialState, action) => {
                 ...state,
                 isLoading: false,
                 errorMessage: action.payload
+            };
+
+        case "CATEGORY_LOADER":
+            return {
+                ...state,
+                categoryLoader: true,
+                categoryError: null,
+                errorMessage: null
+            };
+
+        case "CATEGORY_SUCCESS":
+            return {
+                ...state,
+                categoryLoader: false,
+                categoryError: null
             };
 
         default:

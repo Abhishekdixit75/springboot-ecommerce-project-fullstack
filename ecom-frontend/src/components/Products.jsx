@@ -3,26 +3,28 @@ import ProductCard from "./ProductCard";
 import {FaExclamationTriangle} from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect} from "react";
-import {fetchProducts} from "../store/actions";
+// import {fetchProducts} from "../store/actions";
 import Filter from "./Filter";
 import useProductFilter from "./useProductFilter";
+import {fetchCategories} from "../store/actions";
+import Loader from "./Loader";
 
 const Products = () => {
 	const {isLoading, errorMessage} = useSelector((state) => state.errors);
 
-	const {products} = useSelector((state) => state.products);
+	const {products, categories} = useSelector((state) => state.products);
 	const dispatch = useDispatch();
 	useProductFilter();
 
-	// useEffect(() => {
-	// 	dispatch(fetchProducts());
-	// }, [dispatch]);
+	useEffect(() => {
+		dispatch(fetchCategories());
+	}, [dispatch]);
 
 	return (
 		<div className="lg:px-14 sm:px-8 px-4 py-14 2xl:w-[90%] 2xl:mx-auto">
-			<Filter />
+			<Filter categories={categories ? categories : []} />
 			{isLoading ? (
-				<p>It is loading...</p>
+				<Loader text="Loading products..." />
 			) : errorMessage ? (
 				<div className="flex justfy-center items-center h=[200px]">
 					<FaExclamationTriangle className="text-slate-800 text-3xl mr-2" />
@@ -40,6 +42,7 @@ const Products = () => {
 			)}
 		</div>
 	);
+	
 };
 
 export default Products;

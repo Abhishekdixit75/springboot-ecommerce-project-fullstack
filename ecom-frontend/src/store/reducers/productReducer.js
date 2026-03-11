@@ -4,8 +4,8 @@ const initialState = {
     pagination: {}
 };
 
-export const productReducer = (state = initialState, action) =>{
-    switch(action.type){
+export const productReducer = (state = initialState, action) => {
+    switch (action.type) {
         case "FETCH_PRODUCTS":
             return {
                 ...state,
@@ -20,7 +20,13 @@ export const productReducer = (state = initialState, action) =>{
                 },
             };
 
-        default:
-            return state;
-    }
+        case "FETCH_CATEGORIES":
+            return {
+                ...state,
+                categories: action.payload,
+            }
+            
+            default:
+                return state;
+    };
 };

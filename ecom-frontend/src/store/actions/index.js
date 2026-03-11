@@ -23,3 +23,27 @@ export const fetchProducts = (queryString) => async (dispatch) => {
         });
     }
 }
+
+export const fetchCategories = () => async (dispatch) => {
+    try {
+        dispatch({ type: "CATEGORY_LOADER" });
+        const { data } = await api.get(`public/categories`);
+        dispatch({
+            type: "FETCH_CATEGORIES",
+            payload: data.content,
+            pageNumber: data.pageNumber,
+            pageSize: data.pageSize,
+            totalPages: data.totalPages,
+            totalElements: data.totalElements,
+            lastPage: data.lastPage
+        });
+        dispatch({ type: "CATEGORY_SUCCESS" });
+    }
+    catch (error) {
+        console.log(error);
+        dispatch({
+            type: "IS_ERROR",
+            payload: error?.response?.data?.message || "Failed to fetch categories"
+        });
+    }
+}
