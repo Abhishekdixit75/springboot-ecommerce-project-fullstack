@@ -22,7 +22,7 @@ public class Category {
     private long categoryId;
 
     @NotEmpty
-    @Size(min = 5, message = "Category name must contain at least 5 characters")
+    @Size(min = 3, message = "Category name must contain at least 5 characters")
     private String categoryName;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
