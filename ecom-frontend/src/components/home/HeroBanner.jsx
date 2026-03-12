@@ -33,7 +33,8 @@ const HeroBanner = () => {
 							className={`carousel-item rounded-md sm:h-[500px] h-96 ${colors[i]}`}
 						>
 							<div className="flex items-center h-full">
-								<div className="hidden lg:flex justify-center items-center w-1/2 p-8 ">
+								{/* FOR TEXT  */}
+                                <div className="hidden lg:flex justify-center items-center w-1/2 p-8 ">
 									<div className="text-center">
 										<h3 className="text-3xl text-white font-bold">
 											{item.title}
@@ -52,6 +53,8 @@ const HeroBanner = () => {
 										</Link>
 									</div>
 								</div>
+                                
+                                {/* FOR IMAGES */}
 								<div className="w-full flex items-center justify-center lg:w-1/2 p-4">
 									<img src={item?.image}></img>
 								</div>
