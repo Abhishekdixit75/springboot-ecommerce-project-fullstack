@@ -29,7 +29,7 @@ const Products = () => {
 			{isLoading ? (
 				<Loader text="Loading products..." />
 			) : errorMessage ? (
-				<div className="flex justfy-center items-center h=[200px]">
+				<div className="flex justify-center items-center h=[200px]">
 					<FaExclamationTriangle className="text-slate-800 text-3xl mr-2" />
 					<span className="text-slate-800 text-lg font-medium">
 						{errorMessage}
