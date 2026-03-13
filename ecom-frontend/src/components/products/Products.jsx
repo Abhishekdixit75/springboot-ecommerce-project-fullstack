@@ -1,4 +1,3 @@
-import {MdDescription} from "react-icons/md";
 import ProductCard from "../shared/ProductCard";
 import {FaExclamationTriangle} from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
