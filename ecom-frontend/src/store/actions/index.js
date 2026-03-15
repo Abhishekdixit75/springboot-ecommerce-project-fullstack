@@ -47,3 +47,12 @@ export const fetchCategories = () => async (dispatch) => {
         });
     }
 }
+
+export const addToCart = (data, qty = 1) => (dispatch, getState) => {
+    // find the product
+    const {products} = getState.products;
+
+    // check for stocks
+    // if in stock -> add
+    // if not -> error
+}

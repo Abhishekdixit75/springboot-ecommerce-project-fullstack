@@ -1,11 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { productReducer } from "./reducers/productReducer";
 import errorReducer from "./reducers/errorReducer";
+import { cartReducer } from "./reducers/cartReducer";
+
+const cartItems = localStorage.getItem("cartItems") ? JSON.parse(localStorage.getItem("cartItems")) : [];
+
+const initialState = {
+    carts : {cart: cartItems},
+};
 
 export const store = configureStore({
     reducer: {
         products: productReducer,
-        errors: errorReducer
+        errors: errorReducer,
+        carts: cartReducer
     },
-    preloadedState: {}
+    preloadedState: initialState,
 });
