@@ -2,7 +2,7 @@ import {useState} from "react";
 import {FaTrash} from "react-icons/fa";
 import SetQuantity from "./SetQuantity";
 import {useDispatch} from "react-redux";
-import {decreaseCartQuantity, increaseCartQuantity} from "../../store/actions";
+import {decreaseCartQuantity, increaseCartQuantity, removeFromCart} from "../../store/actions";
 import toast from "react-hot-toast";
 
 const ItemContent = ({
@@ -34,13 +34,12 @@ const ItemContent = ({
 		if (currentQuantity > 1) {
 			const newQuantity = currentQuantity - 1;
 			setCurrentQuantity(newQuantity);
-			dispatch(
-				decreaseCartQuantity(
-					cartItems,
-					newQuantity
-				),
-			);
+			dispatch(decreaseCartQuantity(cartItems, newQuantity));
 		}
+	};
+
+	const removeItemFromCart = (cartItems) => {
+		dispatch(removeFromCart(cartItems, toast));
 	};
 
 	return (
@@ -62,7 +61,17 @@ const ItemContent = ({
 					<div className="flex items-start gap-5 mt-3">
 						<button
 							className="flex items-center font-semibold space-x-2 px-4 py-1 text-xs border border-rose-600 text-rose-600 rounded-md hover:bg-red-50 transition-colors duration-300"
-							onClick={() => {}}
+							onClick={() =>
+								removeItemFromCart({
+									image,
+									productName,
+									description,
+									specialPrice,
+									price,
+									productId,
+									quantity,
+								})
+							}
 						>
 							<FaTrash />
 							Remove
