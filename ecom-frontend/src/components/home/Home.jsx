@@ -42,7 +42,7 @@ const Home = () => {
 						{products &&
 							products
 								?.slice(0, 8)
-								.map((item, i) => <ProductCard key={i} {...item} />)}
+								.map((item) => <ProductCard key={item.productId} {...item} />)}
 						;
 					</div>
 				)}

@@ -1,18 +1,36 @@
 import {MdArrowBack, MdShoppingCart} from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {Link} from "react-router-dom";
 import ItemContent from "./ItemContent";
+import {GiShoppingCart} from "react-icons/gi";
 
 const Cart = () => {
-	const dispatch = useDispatch();
+	// const dispatch = useDispatch();
 	const {cart} = useSelector((state) => state.carts);
 	const newCart = {...cart};
 
 	newCart.totalPrice = cart?.reduce(
-		(acc, cur) => acc * Number(cur?.specialPrice) * Number(cur?.quantity), 0
+		(acc, cur) => acc + Number(cur?.specialPrice) * Number(cur?.quantity),
+		0,
 	);
 
-	if(!cart || cart.length === 0) return <h1>Cart is Empty</h1>
+	if (!cart || cart.length === 0) return (
+		<div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
+			<GiShoppingCart size={56} className="text-gray-400 mb-4" />
+			<div className="text-4xl font-bold text-gray-800 mb-2">
+				Your Cart is Empty
+			</div>
+			<p className="text-gray-500 text-lg mb-6">
+				Add items to get started
+			</p>
+			<Link 
+				to="/products"
+				className="px-6 py-2 bg-custom-blue text-white rounded-sm font-semibold hover:opacity-90 transition duration-500"
+			>
+				Continue Shopping
+			</Link>
+		</div>
+	);
 
 	return (
 		<div className="lg:px-14 sm:px-8 px-4 py-10">
@@ -39,17 +57,17 @@ const Cart = () => {
 			</div>
 
 			<div>
-				{cart && cart.length > 0 &&
-					cart.map((item, i) => <ItemContent key={i} {...item} />)}
+				{cart &&
+					cart.length > 0 &&
+					cart.map((item) => <ItemContent key={item.productId} {...item} />)}
 			</div>
-
 
 			<div className="border-t-[1.5px] border-slate-200 py-4 flex sm:flex-row sm:px-0 px-2 flex-col sm:justify-between gap-4">
 				<div></div>
 				<div className="flex text-sm gap-1 flex-col">
 					<div className="flex justify-between w-full md:text-lg text-sm font-semibold">
 						<span>Subtotal</span>
-						<span>$400</span>
+						<span>${newCart.totalPrice.toFixed(2)}</span>
 					</div>
 
 					<p className="text-slate-500">
@@ -66,10 +84,13 @@ const Cart = () => {
 						</button>
 					</Link>
 
-                    <Link className="flex gap-2 items-center mt-2 text-slate-500" to="/products">
-                    <MdArrowBack />
-                    <span>Continue Shopping</span>
-                    </Link>
+					<Link
+						className="flex gap-2 items-center mt-2 text-slate-500"
+						to="/products"
+					>
+						<MdArrowBack />
+						<span>Continue Shopping</span>
+					</Link>
 				</div>
 			</div>
 		</div>
