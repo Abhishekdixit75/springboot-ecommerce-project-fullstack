@@ -4,12 +4,13 @@ import {Badge} from "@mui/material";
 import {useState} from "react";
 import {IoIosMenu} from "react-icons/io";
 import {RxCross2} from "react-icons/rx";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 
 const Navbar = () => {
 	const path = useLocation().pathname;
 	const [navbarOpen, setNavbarOpen] = useState(false);
 	const {cart} = useSelector((state) => state.carts);
+	const {user} = useSelector((state) => state.auth);
 
 	return (
 		<div className="h-[70px] bg-custom-gradient text-white z-50 flex items-center sticky t-0">
@@ -91,27 +92,31 @@ const Navbar = () => {
 						</Link>
 					</li>
 
-					<li className="font-[500] transition-all duration-150">
-						<Link
-							className="flex items-center space-x-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-purple-600 rounded-md text-white shadow-md hover:from-blue-600 hover:via-purple-600 hover:to-pink-500 transition-all duration-300 ease-in-out transform hover:scale-105"
-							to="/login"
-						>
-							<FaSignInAlt size={25} />
-							<span>login</span>
-						</Link>
-					</li>
+					{user && user.id ? (
+						<li className="font-[500] transition-all duration-150">Welcome, {user.username}</li>
+					) : (
+						<li className="font-[500] transition-all duration-150">
+							<Link
+								className="flex items-center space-x-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-purple-600 rounded-md text-white shadow-md hover:from-blue-600 hover:via-purple-600 hover:to-pink-500 transition-all duration-300 ease-in-out transform hover:scale-105"
+								to="/login"
+							>
+								<FaSignInAlt size={25} />
+								<span>login</span>
+							</Link>
+						</li>
+					)}
 				</ul>
 
 				<button
 					onClick={() => setNavbarOpen(!navbarOpen)}
 					className="sm:hidden flex items-center sm:mt-0 mt-2"
 				>
-                    {navbarOpen ? (
-                        <RxCross2 className="text-white text-3xl" />
-                    ) : (
-                        <IoIosMenu className="text-white text-3xl" />
-                    )}
-                </button>
+					{navbarOpen ? (
+						<RxCross2 className="text-white text-3xl" />
+					) : (
+						<IoIosMenu className="text-white text-3xl" />
+					)}
+				</button>
 			</div>
 		</div>
 	);
