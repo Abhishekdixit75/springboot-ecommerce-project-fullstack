@@ -94,7 +94,10 @@ const Navbar = () => {
 					</li>
 
 					{user && user.id ? (
-						<li className="font-[500] transition-all duration-150"> <UserMenu /> </li>
+						<li className="font-[500] transition-all duration-150">
+							{" "}
+							<UserMenu />{" "}
+						</li>
 					) : (
 						<li className="font-[500] transition-all duration-150">
 							<Link
