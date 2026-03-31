@@ -170,3 +170,10 @@ export const registerNewUser = (sendData, toast, reset, navigate, setLoader) => 
         setLoader(false);
     }
 }
+
+export const logoutUser = (toast, navigate) => (dispatch) => {
+    dispatch({ type: "LOGOUT_USER" });
+    localStorage.removeItem("auth");
+    toast.success("Logged out successfully");
+    navigate("/login");
+}
