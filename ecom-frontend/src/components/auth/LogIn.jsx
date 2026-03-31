@@ -3,9 +3,10 @@ import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {AiOutlineLogin} from "react-icons/ai";
 import InputField from "../shared/InputField";
-import { useDispatch } from "react-redux";
+import {useDispatch} from "react-redux";
 import toast from "react-hot-toast";
-import { authenticateSignInUser } from "../../store/actions";
+import {authenticateSignInUser} from "../../store/actions";
+import Spinners from "../shared/Spinners";
 
 const LogIn = () => {
 	const navigate = useNavigate();
@@ -62,12 +63,22 @@ const LogIn = () => {
 					disabled={loader}
 					className="bg-button-gradient flex gap-2 items-center justify-center font-semibold text-white w-full py-2 hover:text-slate-950 transition-colors duration-600 rounded-sm my-3"
 				>
-					{loader ? "logging in..." : "Login"}
+					{loader ? (
+						<>
+							{" "}
+							<Spinners /> Loading{" "}
+						</>
+					) : (
+						"Login"
+					)}
 				</button>
 
 				<p>
 					Don't have an account ?
-					<Link className="font-semibold underline hover:text-black" to="/register">
+					<Link
+						className="font-semibold underline hover:text-black"
+						to="/register"
+					>
 						<span>SignUp</span>
 					</Link>
 				</p>

@@ -1,15 +1,16 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FaUserPlus } from "react-icons/fa";
+import React, {useState} from "react";
+import {useForm} from "react-hook-form";
+import {FaUserPlus} from "react-icons/fa";
 import {useDispatch} from "react-redux";
 import {Link, useNavigate} from "react-router-dom";
 import InputField from "../shared/InputField";
-import { registerNewUser } from "../../store/actions";
+import {registerNewUser} from "../../store/actions";
 import toast from "react-hot-toast";
+import Spinners from "../shared/Spinners";
 
 const Register = () => {
 	const navigate = useNavigate();
-    const dispatch = useDispatch();
+	const dispatch = useDispatch();
 	const [loader, setLoader] = useState(false);
 	const {
 		register,
@@ -19,8 +20,8 @@ const Register = () => {
 	} = useForm({mode: "onTouched"});
 
 	const registerHandler = async (data) => {
-        console.log("Register clicked");
-        dispatch(registerNewUser(data, toast, reset, navigate, setLoader));
+		console.log("Register clicked");
+		dispatch(registerNewUser(data, toast, reset, navigate, setLoader));
 	};
 
 	return (
@@ -37,8 +38,8 @@ const Register = () => {
 				</div>
 
 				<hr className="mt-2 mb-5 text-black" />
-				
-                <div>
+
+				<div>
 					<InputField
 						label="Username"
 						required
@@ -64,7 +65,7 @@ const Register = () => {
 						required
 						id="password"
 						type="password"
-                        min={6}
+						min={6}
 						message="*Password is required"
 						register={register}
 						errors={errors}
@@ -76,7 +77,13 @@ const Register = () => {
 					disabled={loader}
 					className="bg-button-gradient flex gap-2 items-center justify-center font-semibold text-white w-full py-2 hover:text-slate-950 transition-colors duration-600 rounded-sm my-3"
 				>
-					{loader ? "logging in..." : "Register"}
+					{loader ? (
+						<>
+							<Spinners /> Loading
+						</>
+					) : (
+						"Register"
+					)}
 				</button>
 
 				<p>
