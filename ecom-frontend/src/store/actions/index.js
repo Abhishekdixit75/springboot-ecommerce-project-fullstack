@@ -135,6 +135,10 @@ export const authenticateSignInUser = (sendData, toast, reset, navigate, setLoad
     try{
         setLoader(true);
         const {data} = await api.post("/auth/signin", sendData);
+        dispatch({
+            type: "LOGIN_USER",
+            payload: data,
+        });
         localStorage.setItem("auth", JSON.stringify(data));
         reset();
         toast.success("Logged in successfully");
