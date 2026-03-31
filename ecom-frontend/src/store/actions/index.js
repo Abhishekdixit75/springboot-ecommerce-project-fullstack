@@ -152,3 +152,21 @@ export const authenticateSignInUser = (sendData, toast, reset, navigate, setLoad
         setLoader(false);
     }
 }
+
+export const registerNewUser = (sendData, toast, reset, navigate, setLoader) => async () => {
+
+    try{
+        setLoader(true);
+        const {data} = await api.post("/auth/signup", sendData);
+        reset();
+        toast.success(data?.message || "User registered successfully");
+        navigate("/login");
+    }
+    catch(error) {
+        console.log(error);
+        toast.error(error?.response?.data?.message || "Failed to register");
+    }
+    finally {
+        setLoader(false);
+    }
+}
