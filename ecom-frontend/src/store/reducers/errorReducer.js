@@ -19,14 +19,19 @@ const errorReducer = (state = initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
-                errorMessage: null
+                errorMessage: null,
+                btnLoader: false,
+                categoryLoader: false,
+                categoryError: null
             };
 
         case "IS_ERROR":
             return {
                 ...state,
                 isLoading: false,
-                errorMessage: action.payload
+                errorMessage: action.payload,
+                btnLoader: false,
+                categoryLoader: false,
             };
 
         case "CATEGORY_LOADER":
@@ -35,6 +40,14 @@ const errorReducer = (state = initialState, action) => {
                 categoryLoader: true,
                 categoryError: null,
                 errorMessage: null
+            };
+
+        case "BUTTON_LOADER":
+            return {
+                ...state,
+                btnLoader: true,
+                errorMessage: null,
+                categoryError: null
             };
 
         case "CATEGORY_SUCCESS":
