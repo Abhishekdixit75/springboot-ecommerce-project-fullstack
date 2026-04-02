@@ -116,7 +116,7 @@ export const increaseCartQuantity = (data, toast, currentQuantity, setCurrentQua
 export const decreaseCartQuantity = (data, newQuantity) => (dispatch, getState) => {
     dispatch({
         type: "ADD_CART",
-        payload: {...data, quantity: newQuantity},
+        payload: { ...data, quantity: newQuantity },
     });
     localStorage.setItem("cartItems", JSON.stringify(getState().carts.cart));
 }
@@ -132,9 +132,9 @@ export const removeFromCart = (data, toast) => (dispatch, getState) => {
 
 export const authenticateSignInUser = (sendData, toast, reset, navigate, setLoader) => async (dispatch) => {
 
-    try{
+    try {
         setLoader(true);
-        const {data} = await api.post("/auth/signin", sendData);
+        const { data } = await api.post("/auth/signin", sendData);
         dispatch({
             type: "LOGIN_USER",
             payload: data,
@@ -144,7 +144,7 @@ export const authenticateSignInUser = (sendData, toast, reset, navigate, setLoad
         toast.success("Logged in successfully");
         navigate("/");
     }
-    catch(error) {
+    catch (error) {
         console.log(error);
         toast.error(error?.response?.data?.message || "Failed to login");
     }
@@ -155,14 +155,14 @@ export const authenticateSignInUser = (sendData, toast, reset, navigate, setLoad
 
 export const registerNewUser = (sendData, toast, reset, navigate, setLoader) => async () => {
 
-    try{
+    try {
         setLoader(true);
-        const {data} = await api.post("/auth/signup", sendData);
+        const { data } = await api.post("/auth/signup", sendData);
         reset();
         toast.success(data?.message || "User registered successfully");
         navigate("/login");
     }
-    catch(error) {
+    catch (error) {
         console.log(error);
         toast.error(error?.response?.data?.message || "Failed to register");
     }
@@ -179,23 +179,36 @@ export const logoutUser = (toast, navigate) => (dispatch) => {
 }
 
 export const addUpdateUserAddress =
-     (sendData, toast, addressId, setOpenAddressModal) => async (dispatch) => {
-    dispatch({ type:"BUTTON_LOADER" });
-    try {
-        if (!addressId) {
-            await api.post("/addresses", sendData);
-        } else {
-            await api.put(`/addresses/${addressId}`, sendData);
+    (sendData, toast, addressId, setOpenAddressModal) => async (dispatch) => {
+        dispatch({ type: "BUTTON_LOADER" });
+        try {
+            if (!addressId) {
+                await api.post("/addresses", sendData);
+            } else {
+                await api.put(`/addresses/${addressId}`, sendData);
+            }
+
+            toast.success("Address saved successfully");
+            dispatch({ type: "IS_SUCCESS" });
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.message || "Internal Server Error");
+            dispatch({ type: "IS_ERROR", payload: null });
+        } finally {
+            setOpenAddressModal(false);
         }
-        
-        toast.success("Address saved successfully");
-        dispatch({ type:"IS_SUCCESS" });
+    };
+
+export const getUserAddresses = () => async (dispatch, getState) => {
+    try {
+        dispatch({ type: "IS_FETCHING" });
+        const { data } = await api.get("/addresses");
+        dispatch({ type: "USER_ADDRESS", payload: data });
+        dispatch({type : "IS_SUCCESS"});
     } catch (error) {
         console.log(error);
-        toast.error(error?.response?.data?.message || "Internal Server Error");
-        dispatch({ type:"IS_ERROR", payload: null });
-    } finally {
-        setOpenAddressModal(false);
+        dispatch({type : "IS_ERROR", 
+        payload : error?.response?.data?.message || "Failed to fetch user's addresses"
+        });
     }
-};
-
+}
