@@ -15,7 +15,7 @@ const AddressInfo = () => {
 	};
 
 	return (
-		<div className="pt=4">
+		<div className="pt-4">
 			{noAddressExist ? (
 				<div className="p-6 rounded-lg max-w-md mx-auto flex flex-col items-center">
 					<FaAddressBook size={50} className="text-gray-500 mb-4" />
@@ -51,7 +51,10 @@ const AddressInfo = () => {
 				open={openAddAddressModal}
 				setOpen={setOpenAddAddressModal}
 			>
-				<AddAddressForm />
+				<AddAddressForm
+					address={selectedAddress}
+					setOpenAddressModal={setOpenAddAddressModal}
+				/>
 			</AddressInfoModal>
 		</div>
 	);
