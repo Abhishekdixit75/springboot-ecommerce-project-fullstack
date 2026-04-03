@@ -187,7 +187,7 @@ export const addUpdateUserAddress =
             } else {
                 await api.put(`/addresses/${addressId}`, sendData);
             }
-
+            dispatch(getUserAddresses());
             toast.success("Address saved successfully");
             dispatch({ type: "IS_SUCCESS" });
         } catch (error) {
@@ -199,7 +199,7 @@ export const addUpdateUserAddress =
         }
     };
 
-export const getUserAddresses = () => async (dispatch, getState) => {
+export const getUserAddresses = () => async (dispatch) => {
     try {
         dispatch({ type: "IS_FETCHING" });
         const { data } = await api.get("/addresses");

@@ -1,4 +1,4 @@
-import { Description, Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
+import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { FaTimes } from "react-icons/fa";
 
 const AddressInfoModal = ({open, setOpen, children}) => {

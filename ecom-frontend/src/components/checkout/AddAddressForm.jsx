@@ -5,34 +5,48 @@ import InputField from "../shared/InputField";
 import toast from "react-hot-toast";
 import {addUpdateUserAddress} from "../../store/actions/index";
 import Spinners from "../shared/Spinners";
+import {useEffect} from "react";
 
 const AddAddressForm = ({address, setOpenAddressModal}) => {
 	const dispatch = useDispatch();
+	const {btnLoader} = useSelector((state) => state.errors);
 
 	const {
 		register,
 		handleSubmit,
 		reset,
+		setValue,
 		formState: {errors},
 	} = useForm({mode: "onTouched"});
 
 	const onSaveAddressHandler = async (data) => {
-		dispatch(addUpdateUserAddress(
-      data,
-      toast,
-      address?.addressId,
-      setOpenAddressModal
-    ))
+		dispatch(
+			addUpdateUserAddress(
+				data,
+				toast,
+				address?.addressId,
+				setOpenAddressModal,
+			),
+		);
 	};
 
-	const {btnLoader} = useSelector((state) => state.errors);
+	useEffect(() => {
+		if (address?.addressId) {
+			setValue("buildingName", address?.buildingName);
+			setValue("city", address?.city);
+			setValue("state", address?.state);
+			setValue("pincode", address?.pincode);
+			setValue("street", address?.street);
+			setValue("country", address?.country);
+		}
+	}, [address]);
 
 	return (
 		<div className="">
 			<form onSubmit={handleSubmit(onSaveAddressHandler)} className="">
 				<div className="flex items-center justify-center mb-4 font-semibold text-2xl text-slate-800 py-2 px-4">
 					<FaAddressCard className="mr-2 text-2xl" />
-					Add Address
+					{!address.addressId ? "Add Address" : "Update Address"}
 				</div>
 
 				<div className="space-y-4">
@@ -125,7 +139,6 @@ const AddAddressForm = ({address, setOpenAddressModal}) => {
 						Reset
 					</button>
 				</div>
-
 			</form>
 		</div>
 	);

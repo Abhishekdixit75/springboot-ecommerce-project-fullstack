@@ -9,7 +9,7 @@ import AddressList from "./AddressList";
 const AddressInfo = ({address}) => {
 	const [openAddAddressModal, setOpenAddAddressModal] = useState(false);
 	const [selectedAddress, setSelectedAddress] = useState("");
-	
+
 	const addNewAddressHandler = () => {
 		setSelectedAddress("");
 		setOpenAddAddressModal(true);
@@ -70,6 +70,7 @@ const AddressInfo = ({address}) => {
 					)}
 				</div>
 			)}
+
 			<AddressInfoModal
 				open={openAddAddressModal}
 				setOpen={setOpenAddAddressModal}

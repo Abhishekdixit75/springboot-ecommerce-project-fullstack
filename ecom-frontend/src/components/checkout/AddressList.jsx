@@ -70,13 +70,13 @@ const AddressList = ({addresses, setSelectedAddress, setOpenAddressModal}) => {
 					<div className="flex gap-3 absolute top-4 right-2">
 						<button
 							onClick={() => onEditButtonHandler(address)}
-							className="p-1 bg-blue-200 rounded-md"
+							className="p-1 bg-blue-200 rounded-md cursor-pointer hover:bg-blue-300 transition-colors duration-400"
 						>
 							<FaEdit className="text-blue-500" />
 						</button>
 						<button
 							onClick={() => onDeleteButtonHandler(address)}
-							className="p-1 bg-red-200 rounded-md"
+							className="p-1 bg-red-200 rounded-md cursor-pointer hover:bg-red-300 transition-colors duration-400"
 						>
 							<FaTrashAlt className="text-red-500" />
 						</button>
