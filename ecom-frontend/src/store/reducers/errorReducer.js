@@ -6,7 +6,7 @@ const initialState = {
     btnLoader: false,
 };
 
-const errorReducer = (state = initialState, action) => {
+export const errorReducer = (state = initialState, action) => {
     switch (action.type) {
         case "IS_FETCHING":
             return {
@@ -61,5 +61,3 @@ const errorReducer = (state = initialState, action) => {
             return state;
     }
 };
-
-export default errorReducer;
