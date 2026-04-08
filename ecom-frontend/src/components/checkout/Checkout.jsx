@@ -8,6 +8,7 @@ import {getUserAddresses} from "../../store/actions";
 import toast from "react-hot-toast";
 import Skeleton from "../shared/CustomSkeleton";
 import ErrorPage from "../shared/ErrorPage";
+import PaymentMethod from "./PaymentMethod";
 
 const Checkout = () => {
 	const [activeStep, setActiveStep] = useState(0);
@@ -57,6 +58,7 @@ const Checkout = () => {
 			) : (
 				<div className="mt-5">
 					{activeStep === 0 && <AddressInfo address={address} />}
+					{activeStep === 1 && <PaymentMethod />}
 				</div>
 			)}
 
