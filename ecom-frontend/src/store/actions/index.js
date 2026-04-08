@@ -235,7 +235,7 @@ export const deleteUserAddresses = (toast, addressId, setOpenDeleteModal) => asy
 
 export const clearCheckoutAddress = () => {
     return {
-        type : "REMOVE_SELECTED_USER_CHECKOUT_ADDRESS"
+        type: "REMOVE_SELECTED_USER_CHECKOUT_ADDRESS"
     }
 }
 
@@ -253,3 +253,44 @@ export const addPaymentMethod = (method) => {
     }
 }
 
+export const createUserCart = (sendCartItems) => async (dispatch, getState) => {
+    try {
+        dispatch({
+            type: "IS_FETECHING"
+        });
+        await api.post("/carts/create", sendCartItems);
+        await dispatch(getUserCart());
+
+    } catch (error) {
+        console.log(error);
+        dispatch({
+            type: "IS_ERROR",
+            payload: error?.response?.data?.message || "Failed to create user cart"
+        });
+    }
+}
+
+export const getUserCart = () => async (dispatch, getState) => {
+    try {
+        dispatch({
+            type: "IS_FETECHING"
+        });
+        const {data} = await api.get("/carts/users/cart");
+        dispatch({
+            type : "GET_USER_CART_PRODUCTS",
+            payload: data.products,
+            totalPrice: data.totalPrice,
+            cartId : data.cartId
+        })
+        
+        localStorage.setItem("cartItems", JSON.stringify(getState().carts.cart));
+        dispatch({type : "IS_SUCCESS"});
+
+    } catch (error) {
+        console.log(error);
+        dispatch({
+            type: "IS_ERROR",
+            payload: error?.response?.data?.message || "Failed to fetch user cart"
+        });
+    }
+}
