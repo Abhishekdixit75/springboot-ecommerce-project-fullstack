@@ -294,3 +294,21 @@ export const getUserCart = () => async (dispatch, getState) => {
         });
     }
 }
+
+export const createStripePaymentSecret = (totalPrice, toast) => async (dispatch) => {
+
+    try {
+        dispatch({type : "IS_FETECHING"});
+        const { data } = await api.post("/order/stripe-client-secret", {
+            "amount" : Number(totalPrice) * 100,
+            "currency" : "USD"
+        });
+        dispatch({type : "CLIENT_SECRET",payload : data});
+        localStorage.setItem("client-secret", JSON.stringify(data));
+        dispatch({type : "IS_SUCCESS"});
+    }
+    catch (error) {
+        console.log(error);
+        toast.error(error?.response?.data?.message || "Failed to create client secret");
+    }
+}
