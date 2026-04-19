@@ -41,10 +41,10 @@ class ProductServiceImplTest {
     @Mock
     private ModelMapper modelMapper;
 
-    @Mock
+    @Mock // mock annotation is used for creating the dependency of the class which we want to test
     private FileService fileService;
 
-    @InjectMocks
+    @InjectMocks // and this is used to create the instance of the class which we want to test and inject the mocked dependencies into it
     private ProductServiceImpl productService;
 
     private Category category;
