@@ -44,7 +44,8 @@ class ProductServiceImplTest {
     @Mock // mock annotation is used for creating the dependency of the class which we want to test
     private FileService fileService;
 
-    @InjectMocks // and this is used to create the instance of the class which we want to test and inject the mocked dependencies into it
+    @InjectMocks
+    // and this is used to create the instance of the class which we want to test and inject the mocked dependencies into it
     private ProductServiceImpl productService;
 
     private Category category;
@@ -78,23 +79,23 @@ class ProductServiceImplTest {
 
     @Test
     void testAddProductSuccess() {
-        // Arrange
+        // Arrange: setting up the mock behavior for the dependencies
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         when(modelMapper.map(productDTO, Product.class)).thenReturn(product);
         when(productRepository.save(any(Product.class))).thenReturn(product);
         when(modelMapper.map(product, ProductDTO.class)).thenReturn(productDTO);
 
-        // Act
+        // Act: calling the method which we want to test
         ProductDTO result = productService.addProduct(1L, productDTO);
 
-        // Assert
+        // Assert: verifying the results and interactions
         assertNotNull(result);
         assertEquals("Laptop", result.getProductName());
         assertEquals("High-performance laptop", result.getDescription());
         assertEquals(50000, result.getPrice());
         assertEquals(10, result.getDiscount());
 
-        // Verify interactions
+        // Verify interactions: verifying that the mocked dependencies were called with the expected arguments and number of times
         verify(categoryRepository, times(1)).findById(1L);
         verify(modelMapper, times(1)).map(productDTO, Product.class);
         verify(productRepository, times(1)).save(any(Product.class));
