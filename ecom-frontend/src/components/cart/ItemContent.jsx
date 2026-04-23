@@ -2,10 +2,14 @@ import {useState} from "react";
 import {FaTrash} from "react-icons/fa";
 import SetQuantity from "./SetQuantity";
 import {useDispatch} from "react-redux";
-import {decreaseCartQuantity, increaseCartQuantity, removeFromCart} from "../../store/actions";
+import {
+	decreaseCartQuantity,
+	increaseCartQuantity,
+	removeFromCart,
+} from "../../store/actions";
 import toast from "react-hot-toast";
-import { formatPrice } from "../../utils/formatPrice";
-import { truncateText } from "../../utils/truncateText";
+import {formatPrice} from "../../utils/formatPrice";
+import {truncateText} from "../../utils/truncateText";
 
 const ItemContent = ({
 	productId,
@@ -55,7 +59,11 @@ const ItemContent = ({
 
 				<div className="md:w-36 sm:w-24 w-12">
 					<img
-						src={image}
+						src={
+							image?.startsWith("http")
+								? image
+								: `${import.meta.env.VITE_BACK_END_URL}/images/${image}`
+						}
 						alt={productName}
 						className="md:h- 36 sm:h-24 h-12 w-full object-cover rounded-md"
 					/>
