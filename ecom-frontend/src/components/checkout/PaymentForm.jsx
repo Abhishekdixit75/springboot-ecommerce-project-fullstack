@@ -1,5 +1,5 @@
 import {PaymentElement, useElements, useStripe} from "@stripe/react-stripe-js";
-import React, {use, useState} from "react";
+import React, {useState} from "react";
 import Skeleton from "../shared/CustomSkeleton";
 
 const PaymentForm = ({clientSecret, totalPrice}) => {

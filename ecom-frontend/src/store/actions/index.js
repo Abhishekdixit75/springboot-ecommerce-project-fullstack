@@ -275,16 +275,16 @@ export const getUserCart = () => async (dispatch, getState) => {
         dispatch({
             type: "IS_FETECHING"
         });
-        const {data} = await api.get("/carts/users/cart");
+        const { data } = await api.get("/carts/users/cart");
         dispatch({
-            type : "GET_USER_CART_PRODUCTS",
+            type: "GET_USER_CART_PRODUCTS",
             payload: data.products,
             totalPrice: data.totalPrice,
-            cartId : data.cartId
+            cartId: data.cartId
         })
-        
+
         localStorage.setItem("cartItems", JSON.stringify(getState().carts.cart));
-        dispatch({type : "IS_SUCCESS"});
+        dispatch({ type: "IS_SUCCESS" });
 
     } catch (error) {
         console.log(error);
@@ -298,17 +298,36 @@ export const getUserCart = () => async (dispatch, getState) => {
 export const createStripePaymentSecret = (totalPrice, toast) => async (dispatch) => {
 
     try {
-        dispatch({type : "IS_FETECHING"});
+        dispatch({ type: "IS_FETECHING" });
         const { data } = await api.post("/order/stripe-client-secret", {
-            "amount" : Number(totalPrice) * 100,
-            "currency" : "USD"
+            "amount": Number(totalPrice) * 100,
+            "currency": "USD"
         });
-        dispatch({type : "CLIENT_SECRET",payload : data});
+        dispatch({ type: "CLIENT_SECRET", payload: data });
         localStorage.setItem("client-secret", JSON.stringify(data));
-        dispatch({type : "IS_SUCCESS"});
+        dispatch({ type: "IS_SUCCESS" });
     }
     catch (error) {
         console.log(error);
         toast.error(error?.response?.data?.message || "Failed to create client secret");
+    }
+}
+
+export const stripePaymentConfirmation = (sendData, setErrorMessage, setLoading, toast) => async (dispatch, getState) => {
+
+    try {
+        const { response } = await api.post("/order/users/payments/online", { sendData });
+        if (response.data) {
+            localStorage.removeItem("client-secret");
+            localStorage.removeItem("cartItems");
+            dispatch({ type: "REMOVE_CLIENT_SECRET_ADDRESS" });
+            dispatch({ type: "CLEAR_CART" });
+            toast.success("Payment successful");
+        } else {
+            setErrorMessage("Payment failed. Please try again");
+        }
+    }
+    catch (error) {
+        setErrorMessage("Payment failed. Please try again");
     }
 }
