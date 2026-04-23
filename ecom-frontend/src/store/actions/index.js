@@ -240,6 +240,8 @@ export const clearCheckoutAddress = () => {
 }
 
 export const selectUserCheckoutAddress = (address) => {
+    localStorage.setItem("CHECKOUT_ADDRESS", JSON.stringify(address));
+    
     return {
         type: "SELECT_USER_CHECKOUT_ADDRESS",
         payload: address,
@@ -316,8 +318,9 @@ export const createStripePaymentSecret = (totalPrice, toast) => async (dispatch)
 export const stripePaymentConfirmation = (sendData, setErrorMessage, setLoading, toast) => async (dispatch, getState) => {
 
     try {
-        const { response } = await api.post("/order/users/payments/online", { sendData });
+        const response = await api.post("/order/users/payments/online", sendData);
         if (response.data) {
+            localStorage.removeItem("CHECKOUT_ADDRESS");
             localStorage.removeItem("client-secret");
             localStorage.removeItem("cartItems");
             dispatch({ type: "REMOVE_CLIENT_SECRET_ADDRESS" });

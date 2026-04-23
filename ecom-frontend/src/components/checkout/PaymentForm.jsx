@@ -45,7 +45,7 @@ const PaymentForm = ({clientSecret, totalPrice}) => {
 					)}
 
 					<button
-						className="text-white w-full rounded-md px-5 py-[10px] bg-black mt-2 font-bold disabled:opacity-50 disabled:animate-pulse"
+						className="text-white w-full rounded-md px-5 py-[10px] bg-black mt-2 font-bold disabled:opacity-50 disabled:animate-pulse cursor-pointer"
 						disabled={!stripe || isLoading}
 					>
 						{!isLoading

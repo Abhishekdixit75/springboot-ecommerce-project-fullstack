@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
 import javax.crypto.SecretKey;
-import java.net.ResponseCache;
 import java.security.Key;
 import java.util.Date;
 
@@ -59,7 +58,7 @@ public class JwtUtils {
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
         ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt)
-                .path("/api")
+                .path("/")
                 .maxAge(24 * 60 * 60)
                 .httpOnly(false)
                 .secure(false) // Use false for local development/HTTP
