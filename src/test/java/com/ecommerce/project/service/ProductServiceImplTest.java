@@ -84,6 +84,7 @@ class ProductServiceImplTest {
         when(modelMapper.map(productDTO, Product.class)).thenReturn(product);
         when(productRepository.save(any(Product.class))).thenReturn(product);
         when(modelMapper.map(product, ProductDTO.class)).thenReturn(productDTO);
+        // doNothing().when(productRepository).deleteById(1L);    --> this is used when the return type of the method is 'void'
 
         // Act: calling the method which we want to test
         ProductDTO result = productService.addProduct(1L, productDTO);
