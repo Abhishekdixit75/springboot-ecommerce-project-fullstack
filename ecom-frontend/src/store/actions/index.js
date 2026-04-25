@@ -297,14 +297,11 @@ export const getUserCart = () => async (dispatch, getState) => {
     }
 }
 
-export const createStripePaymentSecret = (totalPrice, toast) => async (dispatch) => {
+export const createStripePaymentSecret = (sendData, toast) => async (dispatch) => {
 
     try {
         dispatch({ type: "IS_FETECHING" });
-        const { data } = await api.post("/order/stripe-client-secret", {
-            "amount": Number(totalPrice) * 100,
-            "currency": "USD"
-        });
+        const { data } = await api.post("/order/stripe-client-secret", sendData);
         dispatch({ type: "CLIENT_SECRET", payload: data });
         localStorage.setItem("client-secret", JSON.stringify(data));
         dispatch({ type: "IS_SUCCESS" });

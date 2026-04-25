@@ -46,7 +46,7 @@ public class AuthController {
     RoleRepository roleRepository;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticate(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
@@ -65,7 +65,7 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal(); // principal is the 'user'
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).toList();
-        UserInfoResponse response = new UserInfoResponse(userDetails.getId(), jwtCookie.getValue(), userDetails.getUsername(), roles);
+        UserInfoResponse response = new UserInfoResponse(userDetails.getId(), jwtCookie.getValue(), userDetails.getUsername(), userDetails.getEmail(), roles);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
