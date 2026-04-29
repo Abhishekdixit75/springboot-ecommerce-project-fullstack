@@ -49,3 +49,18 @@
     border-color: var(--color-gray-200, currentcolor);
   }
 }
+
+/* Ensure a pointer cursor appears for buttons and button-like elements on hover.
+   This is intentionally global and only affects elements that act as buttons
+   (native <button>, [role="button"], or common button classes). It does
+   not change component files and won't override explicit cursor settings. */
+@layer components {
+  button:hover,
+  button:focus,
+  [role="button"]:hover,
+  [role="button"]:focus,
+  .btn:hover,
+  .button:hover {
+    cursor: pointer;
+  }
+}
