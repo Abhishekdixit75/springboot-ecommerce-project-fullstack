@@ -241,7 +241,7 @@ export const clearCheckoutAddress = () => {
 
 export const selectUserCheckoutAddress = (address) => {
     localStorage.setItem("CHECKOUT_ADDRESS", JSON.stringify(address));
-    
+
     return {
         type: "SELECT_USER_CHECKOUT_ADDRESS",
         payload: address,
@@ -333,18 +333,55 @@ export const stripePaymentConfirmation = (sendData, setErrorMessage, setLoading,
 }
 
 export const analyticsAction = () => async (dispatch, getState) => {
-        try {
-            dispatch({ type: "IS_FETCHING"});
-            const { data } = await api.get('/admin/app/analytics');
-            dispatch({
-                type: "FETCH_ANALYTICS",
-                payload: data,
-            })
-            dispatch({ type: "IS_SUCCESS"});
-        } catch (error) {
-            dispatch({ 
-                type: "IS_ERROR",
-                payload: error?.response?.data?.message || "Failed to fetch analytics data",
-            });
-        }
+    try {
+        dispatch({ type: "IS_FETCHING" });
+        const { data } = await api.get('/admin/app/analytics');
+        dispatch({
+            type: "FETCH_ANALYTICS",
+            payload: data,
+        })
+        dispatch({ type: "IS_SUCCESS" });
+    } catch (error) {
+        dispatch({
+            type: "IS_ERROR",
+            payload: error?.response?.data?.message || "Failed to fetch analytics data",
+        });
+    }
+};
+
+export const getOrdersForDashboard = (queryString) => async (dispatch) => {
+    try {
+        dispatch({ type: "IS_FETCHING" });
+        const { data } = await api.get(`/admin/orders?${queryString}`);
+        dispatch({
+            type: "GET_ADMIN_ORDERS",
+            payload: data.content,
+            pageNumber: data.pageNumber,
+            pageSize: data.pageSize,
+            totalElements: data.totalElements,
+            totalPages: data.totalPages,
+            lastPage: data.lastPage,
+        });
+        dispatch({ type: "IS_SUCCESS" });
+    } catch (error) {
+        console.log(error);
+        dispatch({
+            type: "IS_ERROR",
+            payload: error?.response?.data?.message || "Failed to fetch orders data",
+        });
+    }
+};
+
+export const updateOrderStatusFromDashboard = (orderId, orderStatus, toast, setLoader) => async (dispatch, getState) => {
+    try {
+        setLoader(true);
+        const { data } = await api.put(`/admin/orders/${orderId}/status`, { status: orderStatus });
+        toast.success(data.message || "Order updated successfully");
+        await dispatch(getOrdersForDashboard());
+    } catch (error) {
+        console.log(error);
+        toast.error(error?.response?.data?.message || "Internal Server Error");
+    } finally {
+        setLoader(false)
+    }
 };
