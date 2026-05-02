@@ -1,47 +1,57 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {MdAddShoppingCart} from "react-icons/md";
 import {useSelector} from "react-redux";
 import Loader from "../../shared/Loader";
 import {DataGrid} from "@mui/x-data-grid";
 import {FaBoxOpen} from "react-icons/fa";
-import { adminProductTableColumn } from "../../helper/tableColumn";
-import { useDashboardProductFilter } from "../../../hooks/useProductFilter";
+import {adminProductTableColumn} from "../../helper/tableColumn";
+import {useDashboardProductFilter} from "../../../hooks/useProductFilter";
+import Modal from "../../shared/Modal";
+import AddProductForm from "./AddProductForm";
 
 const AdminProducts = () => {
 	const {products, pagination} = useSelector((state) => state.products);
-    const [currentPage, setCurrentPage] = useState(
-      pagination?.pageNumber + 1 || 1
-    );
+	const [currentPage, setCurrentPage] = useState(
+		pagination?.pageNumber + 1 || 1,
+	);
 
 	const {isLoading, errorMessage} = useSelector((state) => state.errors);
-    const emptyProduct = !products || products?.length ===0;
+	const emptyProduct = !products || products?.length === 0;
+	const [selectedProduct, setSelectedProduct] = useState("");
+	const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [openAddModal, setOpenAddModal] = useState(false);
+	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-    const handleEdit = (product) => {}
-    const handleImageUpload = (product) => {}
-    const handleDelete = (product) => {}
-    const handleProductView = (product) => {}
-    const handlePaginationChange = (paginationModel) => {}
+	const handleEdit = (product) => {
+		setSelectedProduct(product);
+		setOpenUpdateModal(true);
+	};
 
-    useDashboardProductFilter();
+	const handleImageUpload = (product) => {};
+	const handleDelete = (product) => {};
+	const handleProductView = (product) => {};
+	const handlePaginationChange = (paginationModel) => {};
 
-    const tableRecords = products?.map((item) => {
-        return {
-            id: item.productId,
-            productName: item.productName,
-            description: item.description,
-            discount: item.discount,
-            image: item.image,
-            price: item.price,
-            quantity: item.quantity,
-            specialPrice: item.specialPrice,
-        }
-    });
+	useDashboardProductFilter();
+
+	const tableRecords = products?.map((item) => {
+		return {
+			id: item.productId,
+			productName: item.productName,
+			description: item.description,
+			discount: item.discount,
+			image: item.image,
+			price: item.price,
+			quantity: item.quantity,
+			specialPrice: item.specialPrice,
+		};
+	});
 
 	return (
 		<div>
 			<div className="pt-6 pb-10 flex justify-end">
 				<button
-					onClick={() => ""}
+					onClick={() => setOpenAddModal(true)}
 					className="bg-custom-blue hover:bg-blue-800 text-white font-semibold py-2 px-4 flex items-center gap-2 rounded-md shadow-md transition-colors hover:text-slate-300 duration-300"
 				>
 					<MdAddShoppingCart className="text-xl" />
@@ -62,9 +72,7 @@ const AdminProducts = () => {
 					{emptyProduct ? (
 						<div className="flex flex-col items-center justify-center text-gray-600 py-10">
 							<FaBoxOpen size={50} className="mb-3" />
-							<h2 className="text-2xl font-semibold">
-								No products added yet
-							</h2>
+							<h2 className="text-2xl font-semibold">No products added yet</h2>
 						</div>
 					) : (
 						<div className="max-w-full">
@@ -102,6 +110,18 @@ const AdminProducts = () => {
 					)}
 				</>
 			)}
+
+			<Modal
+				open={openUpdateModal || openAddModal}
+				setOpen={openUpdateModal ? setOpenUpdateModal : setOpenAddModal}
+				title={openUpdateModal ? "Update Product" : "Add Product"}
+			>
+				<AddProductForm
+					setOpen={openUpdateModal ? setOpenUpdateModal : setOpenAddModal}
+					product={selectedProduct}
+					update={openUpdateModal}
+				/>
+			</Modal>
 		</div>
 	);
 };

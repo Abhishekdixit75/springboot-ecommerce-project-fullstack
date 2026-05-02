@@ -52,11 +52,11 @@ const InputField = ({
 				})}
 			/>
 
-            {errors[id]?.message && (
-                <p className="text-sm font-semibold text-red-600 mt-0">
-                    {errors[id]?.message}
-                </p>
-            )}
+			{errors[id]?.message && (
+				<p className="text-sm font-semibold text-red-600 mt-0">
+					{errors[id]?.message}
+				</p>
+			)}
 		</div>
 	);
 };
