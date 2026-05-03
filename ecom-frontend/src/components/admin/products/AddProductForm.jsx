@@ -86,6 +86,7 @@ const AddProductForm = ({setOpen, product, update = false}) => {
 	}, [dispatch, update]);
 
 	useEffect(() => {
+		// this aims for setting the default category to the first one in the list when the categories are loaded
 		if (!categoryLoader && categories) {
 			setSelectedCategory(categories[0]);
 		}
