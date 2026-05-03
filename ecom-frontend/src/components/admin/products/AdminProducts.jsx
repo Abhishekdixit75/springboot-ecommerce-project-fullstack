@@ -8,6 +8,7 @@ import {adminProductTableColumn} from "../../helper/tableColumn";
 import {useDashboardProductFilter} from "../../../hooks/useProductFilter";
 import Modal from "../../shared/Modal";
 import AddProductForm from "./AddProductForm";
+import DeleteModal from "../../shared/DeleteModal";
 
 const AdminProducts = () => {
 	const {products, pagination} = useSelector((state) => state.products);
@@ -28,7 +29,10 @@ const AdminProducts = () => {
 	};
 
 	const handleImageUpload = (product) => {};
-	const handleDelete = (product) => {};
+	const handleDelete = (product) => {
+		setSelectedProduct(product);
+		setOpenDeleteModal(true);
+	};
 	const handleProductView = (product) => {};
 	const handlePaginationChange = (paginationModel) => {};
 
@@ -122,6 +126,13 @@ const AdminProducts = () => {
 					update={openUpdateModal}
 				/>
 			</Modal>
+
+			<DeleteModal
+				open={openDeleteModal}
+				setOpen={setOpenDeleteModal}
+				title="Delete Product"
+				onDeleteHandler={() => {}}
+			/>
 		</div>
 	);
 };
