@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {MdAddShoppingCart} from "react-icons/md";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Loader from "../../shared/Loader";
 import {DataGrid} from "@mui/x-data-grid";
 import {FaBoxOpen} from "react-icons/fa";
@@ -9,8 +9,11 @@ import {useDashboardProductFilter} from "../../../hooks/useProductFilter";
 import Modal from "../../shared/Modal";
 import AddProductForm from "./AddProductForm";
 import DeleteModal from "../../shared/DeleteModal";
+import toast from "react-hot-toast";
+import {deleteProduct} from "../../../store/actions";
 
 const AdminProducts = () => {
+	const dispatch = useDispatch();
 	const {products, pagination} = useSelector((state) => state.products);
 	const [currentPage, setCurrentPage] = useState(
 		pagination?.pageNumber + 1 || 1,
@@ -22,6 +25,7 @@ const AdminProducts = () => {
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [openAddModal, setOpenAddModal] = useState(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
+	const [loader, setLoader] = useState(false);
 
 	const handleEdit = (product) => {
 		setSelectedProduct(product);
@@ -35,6 +39,12 @@ const AdminProducts = () => {
 	};
 	const handleProductView = (product) => {};
 	const handlePaginationChange = (paginationModel) => {};
+
+	const onDeleteHandler = () => {
+		dispatch(
+			deleteProduct(setLoader, selectedProduct?.id, toast, setOpenDeleteModal),
+		);
+	};
 
 	useDashboardProductFilter();
 
@@ -131,7 +141,8 @@ const AdminProducts = () => {
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
 				title="Delete Product"
-				onDeleteHandler={() => {}}
+				onDeleteHandler={onDeleteHandler}
+				loader={loader}
 			/>
 		</div>
 	);

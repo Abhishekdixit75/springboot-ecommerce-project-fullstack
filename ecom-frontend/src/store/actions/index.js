@@ -424,3 +424,20 @@ export const updateProductFromDashboard = (sendData, toast, reset, setLoader, se
         toast.error(error?.response?.data?.description || "Product update failed");
     }
 };
+
+export const deleteProduct = (setLoader, productId, toast, setOpenDeleteModal, isAdmin=true) => async (dispatch, getState) => {
+    try {
+        setLoader(true)
+        const endpoint = isAdmin ? "/admin/products/" : "/seller/products/";
+        await api.delete(`${endpoint}${productId}`);
+        toast.success("Product deleted successfully");
+        setLoader(false);
+        setOpenDeleteModal(false);
+        await dispatch(dashboardProductsAction());
+    } catch (error) {
+        console.log(error);
+        toast.error(
+            error?.response?.data?.message || "Some Error Occured"
+        )
+    }
+};
