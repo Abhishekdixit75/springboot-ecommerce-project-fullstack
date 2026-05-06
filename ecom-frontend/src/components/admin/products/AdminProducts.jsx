@@ -11,9 +11,16 @@ import AddProductForm from "./AddProductForm";
 import DeleteModal from "../../shared/DeleteModal";
 import toast from "react-hot-toast";
 import {deleteProduct} from "../../../store/actions";
+import ImageUploadForm from "./ImageUploadForm";
+import ProductViewModal from "../../shared/ProductViewModal";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 const AdminProducts = () => {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	const params = new URLSearchParams(searchParams);
+	const pathname = useLocation().pathname;
 	const {products, pagination} = useSelector((state) => state.products);
 	const [currentPage, setCurrentPage] = useState(
 		pagination?.pageNumber + 1 || 1,
@@ -25,6 +32,9 @@ const AdminProducts = () => {
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [openAddModal, setOpenAddModal] = useState(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
+	const [openProductViewModal, setOpenProductViewModal] = useState(false);
+	const [openImageUploadModal, setOpenImageUploadModal] = useState(false);
+
 	const [loader, setLoader] = useState(false);
 
 	const handleEdit = (product) => {
@@ -32,13 +42,24 @@ const AdminProducts = () => {
 		setOpenUpdateModal(true);
 	};
 
-	const handleImageUpload = (product) => {};
+	const handleImageUpload = (product) => {
+		setSelectedProduct(product);
+		setOpenImageUploadModal(true);
+	};
 	const handleDelete = (product) => {
 		setSelectedProduct(product);
 		setOpenDeleteModal(true);
 	};
-	const handleProductView = (product) => {};
-	const handlePaginationChange = (paginationModel) => {};
+	const handleProductView = (product) => {
+		setSelectedProduct(product);
+		setOpenProductViewModal(true);
+	};
+	const handlePaginationChange = (paginationModel) => {
+		const page = paginationModel.page + 1;
+		setCurrentPage(page);
+		params.set("page", page.toString());
+		navigate(`${pathname}?${params}`);
+	};
 
 	const onDeleteHandler = () => {
 		dispatch(
@@ -137,12 +158,29 @@ const AdminProducts = () => {
 				/>
 			</Modal>
 
+			<Modal
+				open={openImageUploadModal}
+				setOpen={setOpenImageUploadModal}
+				title="Add Product Image"
+			>
+				<ImageUploadForm
+					setOpen={setOpenImageUploadModal}
+					product={selectedProduct}
+				/>
+			</Modal>
+
 			<DeleteModal
 				open={openDeleteModal}
 				setOpen={setOpenDeleteModal}
 				title="Delete Product"
 				onDeleteHandler={onDeleteHandler}
 				loader={loader}
+			/>
+
+			<ProductViewModal
+				open={openProductViewModal}
+				setOpen={setOpenProductViewModal}
+				product={selectedProduct}
 			/>
 		</div>
 	);

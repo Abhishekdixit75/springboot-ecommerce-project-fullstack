@@ -425,7 +425,7 @@ export const updateProductFromDashboard = (sendData, toast, reset, setLoader, se
     }
 };
 
-export const deleteProduct = (setLoader, productId, toast, setOpenDeleteModal, isAdmin=true) => async (dispatch, getState) => {
+export const deleteProduct = (setLoader, productId, toast, setOpenDeleteModal, isAdmin = true) => async (dispatch, getState) => {
     try {
         setLoader(true)
         const endpoint = isAdmin ? "/admin/products/" : "/seller/products/";
@@ -439,5 +439,19 @@ export const deleteProduct = (setLoader, productId, toast, setOpenDeleteModal, i
         toast.error(
             error?.response?.data?.message || "Some Error Occured"
         )
+    }
+};
+
+export const updateProductImageFromDashboard = (formData, productId, toast, setLoader, setOpen, isAdmin) => async (dispatch) => {
+    try {
+        setLoader(true);
+        const endpoint = isAdmin ? "/admin/products/" : "/seller/products/";
+        await api.put(`${endpoint}${productId}/image`, formData);
+        toast.success("Image upload successful");
+        setLoader(false);
+        setOpen(false);
+        await dispatch(dashboardProductsAction());
+    } catch (error) {
+        toast.error(error?.response?.data?.description || "Product Image upload failed");
     }
 };
