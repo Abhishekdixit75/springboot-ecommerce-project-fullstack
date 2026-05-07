@@ -4,16 +4,16 @@ import {MdOutlineEmail} from "react-icons/md";
 export const adminOrderTableColumn = (handleEdit) => [
 	{
 		// Column for order ID.
-		sortable: true,
-		disableColumnMenu: false,
-		field: "id",
-		headerName: "orderId",
-		minWidth: 180,
-		headerAlign: "center",
-		editable: false,
-		headerClassName: "text-black font-semibold border",
-		cellClassName: "text-slate-700 font-normal border",
-		renderHeader: (params) => <span className="text-center">Order ID</span>,
+		sortable: true, // this enables sorting for this column
+		disableColumnMenu: false, // this lets us have some options in the column header menu
+		field: "id", // this is the key in our data that this column will display
+		headerName: "orderId", // this is the name that will show up in the column header
+		minWidth: 180, // this sets a minimum width for the column
+		headerAlign: "center", // this centers the header text
+		editable: false, // this means the cells in this column cannot be edited directly
+		headerClassName: "text-black font-semibold border", // this applies some styling to the header
+		cellClassName: "text-slate-700 font-normal border", // this applies some styling to the cells
+		renderHeader: (params) => <span className="text-center">Order ID</span>, // this customizes how the header is rendered, in this case just centering the text
 	},
 	{
 		// Column for customer email.
@@ -91,6 +91,67 @@ export const adminOrderTableColumn = (handleEdit) => [
 					>
 						<FaEdit className="mr-2" />
 						Edit
+					</button>
+				</div>
+			);
+		},
+	},
+];
+
+export const categoryTableColumn = (handleEdit, handleDelete) => [
+	{
+		sortable: true,
+		disableColumnMenu: false,
+		field: "id",
+		headerName: "CategoryId",
+		minWidth: 300,
+		headerAlign: "center",
+		editable: false,
+		headerClassName: "text-black font-semibold border",
+		cellClassName: "text-slate-700 font-normal border",
+		renderHeader: (params) => <span className="text-center">Category ID</span>,
+	},
+	{
+		disableColumnMenu: false,
+		field: "categoryName",
+		headerName: "Category Name",
+		align: "center",
+		width: 400,
+		editable: false,
+		sortable: true,
+		headerAlign: "center",
+		headerClassName: "text-black font-semibold text-center border ",
+		cellClassName: "text-slate-700 font-normal border text-center",
+		renderHeader: (params) => <span>Category Name</span>,
+	},
+	{
+		field: "action",
+		headerName: "Action",
+		headerAlign: "center",
+		editable: false,
+		headerClassName: "text-black font-semibold text-center",
+		cellClassName: "text-slate-700 font-normal",
+		sortable: true,
+		width: 400,
+		renderHeader: (params) => <span>Action</span>,
+		renderCell: (params) => {
+			return (
+				<div className="flex justify-center space-x-2 h-full pt-2">
+					<button
+						onClick={() => handleEdit(params.row)}
+						className="flex items-center bg-blue-500 text-white px-4 h-9 rounded-md "
+					>
+						<FaEdit className="mr-2" />
+						Edit
+					</button>
+
+					{/* Delete Button */}
+					<button
+						onClick={() => handleDelete(params.row)}
+						className="flex items-center bg-red-500 text-white px-4   h-9 rounded-md"
+					>
+						<FaTrashAlt className="mr-2" />
+						Delete
 					</button>
 				</div>
 			);
