@@ -17,7 +17,7 @@ const useOrderFilter = () => {
             ? Number(searchParams.get("page"))
             : 1;
 
-        params.set("pageNumber", currentPage - 1);
+        params.set("pageNumber", currentPage - 1); // this is because the backend pagination starts from 0, while the frontend pagination starts from 1
 
         const queryString = params.toString();
         console.log("QUERY STRING", queryString);

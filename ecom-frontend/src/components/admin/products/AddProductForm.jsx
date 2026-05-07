@@ -3,6 +3,7 @@ import {useForm} from "react-hook-form";
 import toast from "react-hot-toast";
 import {useDispatch, useSelector} from "react-redux";
 import {
+	addNewProductFromDashboard,
 	fetchCategories,
 	updateProductFromDashboard,
 } from "../../../store/actions";

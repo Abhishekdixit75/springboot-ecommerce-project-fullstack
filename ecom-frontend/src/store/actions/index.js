@@ -455,3 +455,22 @@ export const updateProductImageFromDashboard = (formData, productId, toast, setL
         toast.error(error?.response?.data?.description || "Product Image upload failed");
     }
 };
+
+export const addNewProductFromDashboard = (sendData, toast, reset, setLoader, setOpen, isAdmin) => async (dispatch, getState) => {
+    try {
+        setLoader(true);
+        const endpoint = isAdmin ? "/admin/categories/" : "/seller/categories/";
+        await api.post(`${endpoint}${sendData.categoryId}/product`,
+            sendData
+        );
+        toast.success("Product created successfully");
+        reset();
+        setOpen(false);
+        await dispatch(dashboardProductsAction());
+    } catch (error) {
+        console.error(error);
+        toast.error(error?.response?.data?.description || "Product creation failed");
+    } finally {
+        setLoader(false);
+    }
+}
