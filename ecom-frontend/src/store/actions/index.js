@@ -474,3 +474,7 @@ export const addNewProductFromDashboard = (sendData, toast, reset, setLoader, se
         setLoader(false);
     }
 }
+
+export const deleteCategoryDashboardAction = () => {
+
+} 
