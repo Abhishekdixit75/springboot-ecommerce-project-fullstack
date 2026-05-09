@@ -475,6 +475,19 @@ export const addNewProductFromDashboard = (sendData, toast, reset, setLoader, se
     }
 }
 
-export const deleteCategoryDashboardAction = () => {
-
-} 
+export const deleteCategoryDashboardAction = (setLoader, setOpenDeleteModal, categoryId, toast, isAdmin = true) => async (dispatch, getState) => {
+    try {
+        setLoader(true)
+        const endpoint = isAdmin ? "/admin/categories/" : "/seller/categories/";
+        await api.delete(`${endpoint}${categoryId}`);
+        toast.success("Category deleted successfully");
+        setLoader(false);
+        setOpenDeleteModal(false);
+        await dispatch(());
+    } catch (error) {
+        console.log(error);
+        toast.error(
+            error?.response?.data?.message || "Some Error Occured"
+        )
+    }
+};
