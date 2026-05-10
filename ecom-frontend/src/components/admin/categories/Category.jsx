@@ -10,7 +10,8 @@ import {FaFolderOpen, FaThList} from "react-icons/fa";
 import Modal from "../../shared/Modal";
 import AddCategoryForm from "./AddCategoryForm";
 import DeleteModal from "../../shared/DeleteModal";
-import { deleteCategoryDashboardAction } from "../../../store/actions";
+import {deleteCategoryDashboardAction} from "../../../store/actions";
+import ErrorPage from "../../shared/ErrorPage";
 
 const Category = () => {
 	const [searchParams] = useSearchParams();
@@ -59,10 +60,10 @@ const Category = () => {
 	const onDeleteHandler = () => {
 		dispatch(
 			deleteCategoryDashboardAction(
-        Loader,
+				Loader,
 				setOpenDeleteModal,
 				selectedCategory?.id,
-				toast
+				toast,
 			),
 		);
 	};
@@ -132,22 +133,26 @@ const Category = () => {
 				</>
 			)}
 
-      <Modal  
-        open = {openUpdateModal || openModal}
-        setOpen={openUpdateModal ? setOpenUpdateModal : setOpenModal}
-        title= {openUpdateModal ? "Update Category" : "Add Category"}
-        >
-        <AddCategoryForm />    
-      </Modal>
+			<Modal
+				open={openUpdateModal || openModal}
+				setOpen={openUpdateModal ? setOpenUpdateModal : setOpenModal}
+				title={openUpdateModal ? "Update Category" : "Add Category"}
+			>
+				<AddCategoryForm
+					setOpen={openUpdateModal ? setOpenUpdateModal : setOpenModal}
+					open={categoryLoader}
+					category={selectedCategory}
+					update={openUpdateModal}
+				/>
+			</Modal>
 
-      <DeleteModal 
-        open={openDeleteModal}
-        setOpen={setOpenDeleteModal}
-        title="Delete Category"
-        message="Are you sure you want to delete this category?"
-        onDeleteHandler={onDeleteHandler}
-      />
-
+			<DeleteModal
+				open={openDeleteModal}
+				setOpen={setOpenDeleteModal}
+				title="Delete Category"
+				message="Are you sure you want to delete this category?"
+				onDeleteHandler={onDeleteHandler}
+			/>
 		</div>
 	);
 };

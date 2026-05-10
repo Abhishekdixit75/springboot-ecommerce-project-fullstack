@@ -44,7 +44,7 @@ public class CategoryController {
 
 
     @Tag(name = "Category APIs", description = "Endpoints for managing categories")
-    @PostMapping("public/categories")
+    @PostMapping("admin/categories")
     public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
 
         CategoryDTO savedCategoryDTO = categoryService.createCategory(categoryDTO);
@@ -65,7 +65,7 @@ public class CategoryController {
 
 
     @Tag(name = "Category APIs", description = "Endpoints for managing categories")
-    @PutMapping("public/categories/{categoryId}")
+    @PutMapping("admin/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO,
                                                       @PathVariable Long categoryId) {
         CategoryDTO savedCategoryDTO = categoryService.updateCategory(categoryDTO, categoryId);

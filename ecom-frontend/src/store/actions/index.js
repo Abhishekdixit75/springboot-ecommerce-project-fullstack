@@ -24,10 +24,10 @@ export const fetchProducts = (queryString) => async (dispatch) => {
     }
 }
 
-export const fetchCategories = () => async (dispatch) => {
+export const fetchCategories = (queryString = "") => async (dispatch) => {
     try {
         dispatch({ type: "CATEGORY_LOADER" });
-        const { data } = await api.get(`public/categories`);
+        const { data } = await api.get(`public/categories?${queryString}`);
         dispatch({
             type: "FETCH_CATEGORIES",
             payload: data.content,
@@ -483,11 +483,37 @@ export const deleteCategoryDashboardAction = (setLoader, setOpenDeleteModal, cat
         toast.success("Category deleted successfully");
         setLoader(false);
         setOpenDeleteModal(false);
-        await dispatch(());
+        await dispatch(fetchCategories());
     } catch (error) {
         console.log(error);
         toast.error(
             error?.response?.data?.message || "Some Error Occured"
         )
     }
+};
+
+export const createCategoryDashboardAction = (sendData, setOpen, reset, toast) => async (dispatch, getState) => {
+    try {
+        dispatch({ type: "CATEGORY_LOADER" });
+        await api.post("/admin/categories", sendData);
+        dispatch({ type: "CATEGORY_SUCCESS" });
+        reset(); // this is for reseting the form after successful category creation
+        toast.success("Category Created Successful");
+        setOpen(false);
+        await dispatch(fetchCategories());
+    } catch (err) {
+        console.log(err);
+        toast.error(
+            err?.response?.data?.categoryName || "Failed to create new category"
+        );
+
+        dispatch({
+            type: "IS_ERROR",
+            payload: err?.response?.data?.message || "Internal Server Error",
+        });
+    }
+};
+
+export const updateCategoryDashboardAction = () => {
+    
 };
