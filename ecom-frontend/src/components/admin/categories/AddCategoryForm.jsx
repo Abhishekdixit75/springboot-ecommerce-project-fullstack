@@ -1,11 +1,14 @@
-import React, { useEffect } from "react";
+import React, {useEffect} from "react";
 import {useForm} from "react-hook-form";
 import toast from "react-hot-toast";
 import {useDispatch} from "react-redux";
-import {createCategoryDashboardAction, updateCategoryDashboardAction} from "../../../store/actions";
+import {
+	createCategoryDashboardAction,
+	updateCategoryDashboardAction,
+} from "../../../store/actions";
 import InputField from "../../shared/InputField";
 
-const AddCategoryForm = ({setOpen, open, category, update = false}) => {
+const AddCategoryForm = ({setOpen, open, category, update = false, queryString = ""}) => {
 	const dispatch = useDispatch();
 
 	const {
@@ -21,11 +24,11 @@ const AddCategoryForm = ({setOpen, open, category, update = false}) => {
 	const addNewCategoryHandler = (data) => {
 		if (!update) {
 			//dispatch createCategoryDashboardAction
-			dispatch(createCategoryDashboardAction(data, setOpen, reset, toast));
+			dispatch(createCategoryDashboardAction(data, setOpen, reset, toast, queryString));
 		} else {
 			//dispatch updateCategoryDashboardAction
 			dispatch(
-				updateCategoryDashboardAction(data, setOpen, category.id, reset, toast),
+				updateCategoryDashboardAction(data, setOpen, category.id, reset, toast, queryString),
 			);
 		}
 	};
@@ -34,6 +37,7 @@ const AddCategoryForm = ({setOpen, open, category, update = false}) => {
 			setValue("categoryName", category?.categoryName);
 		}
 	}, [update, category]);
+	
 	return (
 		<div className="py-5 relative h-full ">
 			<form

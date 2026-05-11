@@ -475,15 +475,13 @@ export const addNewProductFromDashboard = (sendData, toast, reset, setLoader, se
     }
 }
 
-export const deleteCategoryDashboardAction = (setLoader, setOpenDeleteModal, categoryId, toast, isAdmin = true) => async (dispatch, getState) => {
+export const deleteCategoryDashboardAction = (setOpenDeleteModal, categoryId, toast, queryString = "", isAdmin = true) => async (dispatch, getState) => {
     try {
-        setLoader(true)
         const endpoint = isAdmin ? "/admin/categories/" : "/seller/categories/";
         await api.delete(`${endpoint}${categoryId}`);
         toast.success("Category deleted successfully");
-        setLoader(false);
         setOpenDeleteModal(false);
-        await dispatch(fetchCategories());
+        await dispatch(fetchCategories(queryString));
     } catch (error) {
         console.log(error);
         toast.error(
@@ -492,7 +490,7 @@ export const deleteCategoryDashboardAction = (setLoader, setOpenDeleteModal, cat
     }
 };
 
-export const createCategoryDashboardAction = (sendData, setOpen, reset, toast) => async (dispatch, getState) => {
+export const createCategoryDashboardAction = (sendData, setOpen, reset, toast, queryString = "") => async (dispatch, getState) => {
     try {
         dispatch({ type: "CATEGORY_LOADER" });
         await api.post("/admin/categories", sendData);
@@ -500,7 +498,7 @@ export const createCategoryDashboardAction = (sendData, setOpen, reset, toast) =
         reset(); // this is for reseting the form after successful category creation
         toast.success("Category Created Successful");
         setOpen(false);
-        await dispatch(fetchCategories());
+        await dispatch(fetchCategories(queryString));
     } catch (err) {
         console.log(err);
         toast.error(
@@ -514,6 +512,24 @@ export const createCategoryDashboardAction = (sendData, setOpen, reset, toast) =
     }
 };
 
-export const updateCategoryDashboardAction = () => {
-    
+export const updateCategoryDashboardAction = (sendData, setOpen, categoryID, reset, toast, queryString = "") => async (dispatch, getState) => {
+    try {
+        dispatch({ type: "CATEGORY_LOADER" });
+        await api.put(`/admin/categories/${categoryID}`, sendData);
+        dispatch({ type: "CATEGORY_SUCCESS" });
+        reset();
+        toast.success("Category Update Successful");
+        setOpen(false);
+        await dispatch(fetchCategories(queryString));
+    } catch (err) {
+        console.log(err);
+        toast.error(
+            err?.response?.data?.categoryName || "Failed to update category"
+        );
+
+        dispatch({
+            type: "IS_ERROR",
+            payload: err?.response?.data?.message || "Internal Server Error",
+        });
+    }
 };

@@ -31,6 +31,16 @@ const Category = () => {
 		pagination?.pageNumber + 1 || 1,
 	);
 
+	const getCategoryQueryString = () => {
+		const params = new URLSearchParams();
+		const currentPageNumber = searchParams.get("page")
+			? Number(searchParams.get("page"))
+			: 1;
+
+		params.set("pageNumber", currentPageNumber - 1);
+		return params.toString();
+	};
+
 	useCategoryFilter();
 
 	const tableRecords = categories?.map((item) => {
@@ -60,10 +70,10 @@ const Category = () => {
 	const onDeleteHandler = () => {
 		dispatch(
 			deleteCategoryDashboardAction(
-				Loader,
 				setOpenDeleteModal,
 				selectedCategory?.id,
 				toast,
+				getCategoryQueryString(),
 			),
 		);
 	};
@@ -143,6 +153,7 @@ const Category = () => {
 					open={categoryLoader}
 					category={selectedCategory}
 					update={openUpdateModal}
+					queryString={getCategoryQueryString()}
 				/>
 			</Modal>
 
