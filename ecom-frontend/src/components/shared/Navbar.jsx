@@ -12,7 +12,8 @@ const Navbar = () => {
 	const [navbarOpen, setNavbarOpen] = useState(false);
 	const {cart} = useSelector((state) => state.carts);
 	const {user} = useSelector((state) => state.auth);
-
+	const isAdmin = user?.roles?.includes("ROLE_ADMIN");
+	
 	return (
 		<div className="h-[70px] bg-custom-gradient text-white z-50 flex items-center sticky t-0">
 			<div className="lg:px-14 sm:px-8 px-4 w-full flex justify-between">
@@ -26,6 +27,17 @@ const Navbar = () => {
 						navbarOpen ? "h-fit sm:pb-0 pb-5" : "h-0 overflow-hidden"
 					}  transition-all duration-100 sm:h-fit sm:bg-none bg-custom-gradient   text-white sm:w-fit w-full sm:flex-row flex-col px-4 sm:px-0`}
 				>
+					{isAdmin && (
+						<li className="font-[500] transition-all duration-150">
+							<Link
+								className="flex items-center space-x-2 px-4 py-1.5 bg-white text-slate-900 rounded-md shadow-md hover:bg-slate-100 transition-all duration-300 ease-in-out transform hover:scale-105"
+								to="/admin"
+							>
+								<span>Admin</span>
+							</Link>
+						</li>
+					)}
+
 					<li className="font-[500] transition-all duration-150">
 						<Link
 							className={`${
