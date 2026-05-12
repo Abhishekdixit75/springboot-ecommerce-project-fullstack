@@ -17,7 +17,9 @@ import com.ecommerce.project.security.services.UserDetailsImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -130,7 +132,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserResponse getAllSellers(Pageable pageDetails) {
+    public UserResponse getAllSellers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
         Page<User> allUsers = userRepository.findByRoleName(AppRole.ROLE_SELLER, pageDetails);
         List<UserDTO> userDTOs = allUsers.getContent().stream().map(p -> modelMapper.map(p, UserDTO.class)).toList();
 

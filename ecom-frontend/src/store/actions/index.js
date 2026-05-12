@@ -533,3 +533,46 @@ export const updateCategoryDashboardAction = (sendData, setOpen, categoryID, res
         });
     }
 };
+
+
+export const getAllSellersDashboard = (queryString) => async (dispatch) => {
+    try {
+        dispatch({ type: "IS_FETCHING" });
+        const { data } = await api.get(`/auth/sellers?${queryString}`);
+        dispatch({
+            type: "FETCH_SELLERS",
+            payload: data.content,
+            pageNumber: data.pageNumber,
+            pageSize: data.pageSize,
+            totalPages: data.totalPages,
+            totalElements: data.totalElements,
+            lastPage: data.lastPage
+        });
+        dispatch({ type: "IS_SUCCESS" });
+    } catch (error) {
+        console.log(error);
+        dispatch({
+            type: "IS_ERROR",
+            payload: error?.response?.data?.message || "Failed to fetch sellers data",
+        });
+    }
+};
+
+export const addNewSellerFromDashboard = (sendData, toast, reset, setLoader, setOpen) => async (dispatch, getState) => {
+    try {
+        setLoader(true);
+        const endpoint = "/auth/signup";
+        await api.post(`${endpoint}`,
+            sendData
+        );
+        toast.success("Seller created successfully");
+        reset();
+        setOpen(false);
+        await dispatch(getAllSellersDashboard());
+    } catch (error) {
+        console.error(error);
+        toast.error(error?.response?.data?.description || "Seller creation failed");
+    } finally {
+        setLoader(false);
+    }
+};

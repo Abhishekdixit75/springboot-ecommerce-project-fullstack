@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { dashboardProductsAction, fetchProducts } from "../store/actions";
 
 export const useProductFilter = () => {
-	const [searchParams] = useSearchParams();
+	const [searchParams] = useSearchParams(); // this is used to get the current search params from the current url
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -30,7 +30,7 @@ export const useProductFilter = () => {
 		}
 
 		const queryString = params.toString();
-		console.log("QUERY STRING :" + queryString);
+		// console.log("QUERY STRING :" + queryString);
 
 		dispatch(fetchProducts(queryString));
 	}, [dispatch, searchParams]);
