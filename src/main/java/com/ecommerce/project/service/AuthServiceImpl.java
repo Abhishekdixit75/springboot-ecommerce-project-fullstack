@@ -4,6 +4,8 @@ import com.ecommerce.project.model.AppRole;
 import com.ecommerce.project.model.Role;
 import com.ecommerce.project.model.User;
 import com.ecommerce.project.payload.AuthenticationResult;
+import com.ecommerce.project.payload.UserDTO;
+import com.ecommerce.project.payload.UserResponse;
 import com.ecommerce.project.repositories.RoleRepository;
 import com.ecommerce.project.repositories.UserRepository;
 import com.ecommerce.project.security.jwt.JwtUtils;
@@ -12,7 +14,10 @@ import com.ecommerce.project.security.request.SignupRequest;
 import com.ecommerce.project.security.response.MessageResponse;
 import com.ecommerce.project.security.response.UserInfoResponse;
 import com.ecommerce.project.security.services.UserDetailsImpl;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,17 +50,22 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public AuthenticationResult login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication); // sets the authentication in the Current executing thread
+        SecurityContextHolder.getContext().setAuthentication(authentication); // sets the authentication in the Current
+                                                                              // executing thread
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal(); // principal is the 'user'
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).toList();
-        UserInfoResponse response = new UserInfoResponse(userDetails.getId(), jwtCookie.getValue(), userDetails.getUsername(), userDetails.getEmail(), roles);
+        UserInfoResponse response = new UserInfoResponse(userDetails.getId(), jwtCookie.getValue(),
+                userDetails.getUsername(), userDetails.getEmail(), roles);
 
         return new AuthenticationResult(response, jwtCookie);
     }
@@ -78,21 +88,25 @@ public class AuthServiceImpl implements AuthService {
         Set<Role> roles = new HashSet<>();
 
         if (strRoles == null) {
-            Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error : Role is not found"));
+            Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Error : Role is not found"));
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error : Role is not found"));
+                        Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error : Role is not found"));
                         roles.add(adminRole);
                         break;
                     case "seller":
-                        Role sellerRole = roleRepository.findByRoleName(AppRole.ROLE_SELLER).orElseThrow(() -> new RuntimeException("Error : Role is not found"));
+                        Role sellerRole = roleRepository.findByRoleName(AppRole.ROLE_SELLER)
+                                .orElseThrow(() -> new RuntimeException("Error : Role is not found"));
                         roles.add(sellerRole);
                         break;
                     default:
-                        Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error : Role is not found"));
+                        Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException("Error : Role is not found"));
                         roles.add(userRole);
                 }
             });
@@ -113,5 +127,21 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseCookie logout() {
         return jwtUtils.getCleanJwtCookie();
+    }
+
+    @Override
+    public UserResponse getAllSellers(Pageable pageDetails) {
+        Page<User> allUsers = userRepository.findByRoleName(AppRole.ROLE_SELLER, pageDetails);
+        List<UserDTO> userDTOs = allUsers.getContent().stream().map(p -> modelMapper.map(p, UserDTO.class)).toList();
+
+        UserResponse userResponse = new UserResponse();
+        userResponse.setContent(userDTOs);
+        userResponse.setPageNumber(allUsers.getNumber());
+        userResponse.setPageSize(allUsers.getSize());
+        userResponse.setTotalPages(allUsers.getTotalPages());
+        userResponse.setTotalElements(allUsers.getTotalElements());
+        userResponse.setLastPage(allUsers.isLast());
+
+        return userResponse;
     }
 }
