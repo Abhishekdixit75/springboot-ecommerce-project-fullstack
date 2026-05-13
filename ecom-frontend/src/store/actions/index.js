@@ -349,10 +349,13 @@ export const analyticsAction = () => async (dispatch, getState) => {
     }
 };
 
-export const getOrdersForDashboard = (queryString) => async (dispatch) => {
+export const getOrdersForDashboard = (queryString, isAdmin) => async (dispatch) => {
     try {
         dispatch({ type: "IS_FETCHING" });
-        const { data } = await api.get(`/admin/orders?${queryString}`);
+
+        const endpoint = isAdmin ? '/admin/orders' : '/seller/orders';
+        const { data } = await api.get(`${endpoint}?${queryString}`);
+
         dispatch({
             type: "GET_ADMIN_ORDERS",
             payload: data.content,
@@ -372,10 +375,11 @@ export const getOrdersForDashboard = (queryString) => async (dispatch) => {
     }
 };
 
-export const updateOrderStatusFromDashboard = (orderId, orderStatus, toast, setLoader) => async (dispatch, getState) => {
+export const updateOrderStatusFromDashboard = (orderId, orderStatus, toast, setLoader, isAdmin) => async (dispatch, getState) => {
     try {
         setLoader(true);
-        const { data } = await api.put(`/admin/orders/${orderId}/status`, { status: orderStatus });
+        const endpoint = isAdmin ? "/admin/orders/" : "/seller/orders/";
+        const { data } = await api.put(`${endpoint}${orderId}/status`, { status: orderStatus });
         toast.success(data.message || "Order updated successfully");
         await dispatch(getOrdersForDashboard());
     } catch (error) {
@@ -386,10 +390,10 @@ export const updateOrderStatusFromDashboard = (orderId, orderStatus, toast, setL
     }
 };
 
-export const dashboardProductsAction = (queryString) => async (dispatch) => {
+export const dashboardProductsAction = (queryString, isAdmin) => async (dispatch) => {
     try {
         dispatch({ type: "IS_FETCHING" });
-        const endpoint = "/admin/products";
+        const endpoint = isAdmin ? "/admin/products" : "/seller/products";
         const { data } = await api.get(`${endpoint}?${queryString}`);
         dispatch({
             type: "FETCH_PRODUCTS",

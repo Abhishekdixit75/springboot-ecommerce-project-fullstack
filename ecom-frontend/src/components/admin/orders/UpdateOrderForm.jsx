@@ -6,9 +6,9 @@ import FormHelperText from "@mui/material/FormHelperText";
 import InputLabel from "@mui/material/InputLabel";
 import React, {useState} from "react";
 import Spinners from "../../shared/Spinners";
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import toast from "react-hot-toast";
-import { updateOrderStatusFromDashboard } from "../../../store/actions";
+import {updateOrderStatusFromDashboard} from "../../../store/actions";
 
 const ORDER_STATUSES = [
 	"Pending",
@@ -30,8 +30,10 @@ const UpdateOrderForm = ({
 		selectedItem?.status || "Accepted",
 	);
 	const [error, setError] = useState("");
-    const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
+	const {user} = useSelector((state) => state.auth);
+	const isAdmin = user && user?.roles?.includes("ROLE_ADMIN");
 
 	const updateOrderStatus = (e) => {
 		e.preventDefault();
@@ -45,7 +47,7 @@ const UpdateOrderForm = ({
 				orderStatus,
 				toast,
 				setLoader,
-				
+				isAdmin,
 			),
 		);
 	};
@@ -54,7 +56,9 @@ const UpdateOrderForm = ({
 		<div className="py-5 relative h-full">
 			<form className="space-y-4" onSubmit={updateOrderStatus}>
 				<FormControl fullWidth variant="outlined" error={!!error}>
-					<InputLabel id="order-status-label">Order Status</InputLabel>
+					<InputLabel id="order-status-label">
+						Order Status
+					</InputLabel>
 					<Select
 						labelId="order-status-label"
 						label="Order Status"
