@@ -11,6 +11,7 @@ import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.repositories.CartRepository;
 import com.ecommerce.project.repositories.CategoryRepository;
 import com.ecommerce.project.repositories.ProductRepository;
+import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +53,9 @@ public class ProductServiceImpl implements ProductService {
     @Value("${image.base.url}")
     private String imageBaseUrl;
 
+    @Autowired
+    private AuthUtil authUtil;
+
     @Override
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
         Category category = categoryRepository.findById(categoryId)
@@ -72,6 +76,7 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
             double specialPrice = product.getPrice() - ((product.getDiscount() * 0.01) * product.getPrice());
             product.setSpecialPrice(specialPrice);
+            product.setUser(authUtil.loggedInUser());
             Product savedProduct = productRepository.save(product);
             return modelMapper.map(savedProduct, ProductDTO.class);
         } else {
