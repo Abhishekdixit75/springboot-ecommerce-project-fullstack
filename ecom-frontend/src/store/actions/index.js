@@ -429,7 +429,7 @@ export const updateProductFromDashboard = (sendData, toast, reset, setLoader, se
     }
 };
 
-export const deleteProduct = (setLoader, productId, toast, setOpenDeleteModal, isAdmin = true) => async (dispatch, getState) => {
+export const deleteProduct = (setLoader, productId, toast, setOpenDeleteModal, isAdmin) => async (dispatch, getState) => {
     try {
         setLoader(true)
         const endpoint = isAdmin ? "/admin/products/" : "/seller/products/";

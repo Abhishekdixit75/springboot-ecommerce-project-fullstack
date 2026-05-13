@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import {deleteProduct} from "../../../store/actions";
 import ImageUploadForm from "./ImageUploadForm";
 import ProductViewModal from "../../shared/ProductViewModal";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
 
 const AdminProducts = () => {
 	const dispatch = useDispatch();
@@ -25,6 +25,9 @@ const AdminProducts = () => {
 	const [currentPage, setCurrentPage] = useState(
 		pagination?.pageNumber + 1 || 1,
 	);
+
+	const {user} = useSelector((state) => state.auth);
+	const isAdmin = user?.roles?.includes("ROLE_ADMIN");
 
 	const {isLoading, errorMessage} = useSelector((state) => state.errors);
 	const emptyProduct = !products || products?.length === 0;
@@ -63,7 +66,13 @@ const AdminProducts = () => {
 
 	const onDeleteHandler = () => {
 		dispatch(
-			deleteProduct(setLoader, selectedProduct?.id, toast, setOpenDeleteModal),
+			deleteProduct(
+				setLoader,
+				selectedProduct?.id,
+				toast,
+				setOpenDeleteModal,
+				isAdmin,
+			),
 		);
 	};
 
@@ -107,7 +116,9 @@ const AdminProducts = () => {
 					{emptyProduct ? (
 						<div className="flex flex-col items-center justify-center text-gray-600 py-10">
 							<FaBoxOpen size={50} className="mb-3" />
-							<h2 className="text-2xl font-semibold">No products added yet</h2>
+							<h2 className="text-2xl font-semibold">
+								No products added yet
+							</h2>
 						</div>
 					) : (
 						<div className="max-w-full">
@@ -125,7 +136,8 @@ const AdminProducts = () => {
 								initialState={{
 									pagination: {
 										paginationModel: {
-											pageSize: pagination?.pageSize || 10,
+											pageSize:
+												pagination?.pageSize || 10,
 											page: currentPage - 1,
 										},
 									},
@@ -138,7 +150,8 @@ const AdminProducts = () => {
 								paginationOptions={{
 									showFirstButton: true,
 									showLastButton: true,
-									hideNextButton: currentPage === pagination?.totalPages,
+									hideNextButton:
+										currentPage === pagination?.totalPages,
 								}}
 							/>
 						</div>
@@ -152,7 +165,9 @@ const AdminProducts = () => {
 				title={openUpdateModal ? "Update Product" : "Add Product"}
 			>
 				<AddProductForm
-					setOpen={openUpdateModal ? setOpenUpdateModal : setOpenAddModal}
+					setOpen={
+						openUpdateModal ? setOpenUpdateModal : setOpenAddModal
+					}
 					product={selectedProduct}
 					update={openUpdateModal}
 				/>
