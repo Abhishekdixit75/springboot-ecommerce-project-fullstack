@@ -1,3 +1,4 @@
+#!/bin/sh
 echo "🚀 Running full project lint check before push..."
 cd ecom-frontend && npm run lint
 echo "✨ All clear! Pushing to remote..."
