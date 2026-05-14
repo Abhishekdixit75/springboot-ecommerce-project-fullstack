@@ -1,32 +1,42 @@
 const initialState = {
-    user: null,
-    address: [],
-    clientSecret: null,
-    selectedUserCheckoutAddress: null
+   user: null,
+   address: [],
+   clientSecret: null,
+   selectedUserCheckoutAddress: null,
 };
 
 export const authReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case "LOGIN_USER":
-            return { ...state, user: action.payload };
+   switch (action.type) {
+      case 'LOGIN_USER':
+         return { ...state, user: action.payload };
 
-        case "LOGOUT_USER":
-            return { ...state, user: null, address: null, clientSecret: null, selectedUserCheckoutAddress: null };
+      case 'LOGOUT_USER':
+         return {
+            ...state,
+            user: null,
+            address: null,
+            clientSecret: null,
+            selectedUserCheckoutAddress: null,
+         };
 
-        case "USER_ADDRESS":
-            return { ...state, address: action.payload };
+      case 'USER_ADDRESS':
+         return { ...state, address: action.payload };
 
-        case "SELECT_USER_CHECKOUT_ADDRESS":
-            return { ...state, selectedUserCheckoutAddress: action.payload };
+      case 'SELECT_USER_CHECKOUT_ADDRESS':
+         return { ...state, selectedUserCheckoutAddress: action.payload };
 
-        case "REMOVE_SELECTED_USER_CHECKOUT_ADDRESS":
-            return { ...state, selectedUserCheckoutAddress: null };
+      case 'REMOVE_SELECTED_USER_CHECKOUT_ADDRESS':
+         return { ...state, selectedUserCheckoutAddress: null };
 
-        case "CLIENT_SECRET" :
-            return { ...state, clientSecret: action.payload };
-        case "REMOVE_CLIENT_SECRET_ADDRESS" :
-            return { ...state, clientSecret: null, selectedUserCheckoutAddress: null };
-        default:
-            return state;
-    }
+      case 'CLIENT_SECRET':
+         return { ...state, clientSecret: action.payload };
+      case 'REMOVE_CLIENT_SECRET_ADDRESS':
+         return {
+            ...state,
+            clientSecret: null,
+            selectedUserCheckoutAddress: null,
+         };
+      default:
+         return state;
+   }
 };

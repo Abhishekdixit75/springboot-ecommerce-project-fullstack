@@ -1,30 +1,57 @@
-import { Button, Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import {
+   Button,
+   Dialog,
+   DialogBackdrop,
+   DialogPanel,
+   DialogTitle,
+} from '@headlessui/react';
 import { Divider } from '@mui/material';
 import { MdClose, MdDone } from 'react-icons/md';
 import Status from './Status';
 
-function ProductViewModal({ open, setOpen, product, isAvailable}) {
-
-   const { productId, productName, image, description, quantity, price, discount, specialPrice } = product;
+function ProductViewModal({ open, setOpen, product, isAvailable }) {
+   const {
+      productId,
+      productName,
+      image,
+      description,
+      quantity,
+      price,
+      discount,
+      specialPrice,
+   } = product;
 
    return (
       <>
-         <Dialog open={open} as="div" className="relative z-10" onClose={setOpen} __demoMode>
+         <Dialog
+            open={open}
+            as="div"
+            className="relative z-10"
+            onClose={setOpen}
+            __demoMode
+         >
             <DialogBackdrop className="fixed inset-0 bg-black/60 transition-opacity" />
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                <div className="flex min-h-full items-center justify-center p-4">
-                  <DialogPanel transition
-                     className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all md:max-w-155 md:min-w-155 w-full">
-
+                  <DialogPanel
+                     transition
+                     className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all md:max-w-155 md:min-w-155 w-full"
+                  >
                      {image && (
-                        <div className='flex justify-center aspect-3/2'>
-                           <img className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105" src={image} alt={productName}></img>
+                        <div className="flex justify-center aspect-3/2">
+                           <img
+                              className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105"
+                              src={image}
+                              alt={productName}
+                           ></img>
                         </div>
-
                      )}
 
-                     <div className='px-6 pt-10 pb-2'>
-                        <DialogTitle as="h1" className="lg:text-3xl sm:text-2xl text-xl font-semibold leading-6 text-gray-800 mb-4">
+                     <div className="px-6 pt-10 pb-2">
+                        <DialogTitle
+                           as="h1"
+                           className="lg:text-3xl sm:text-2xl text-xl font-semibold leading-6 text-gray-800 mb-4"
+                        >
                            {productName}
                         </DialogTitle>
                      </div>
@@ -42,7 +69,7 @@ function ProductViewModal({ open, setOpen, product, isAvailable}) {
                               </div>
                            ) : (
                               <span className="text-xl font-bold">
-                                 {" "}
+                                 {' '}
                                  ${Number(price).toFixed(2)}
                               </span>
                            )}
@@ -80,10 +107,10 @@ function ProductViewModal({ open, setOpen, product, isAvailable}) {
                      </div>
                   </DialogPanel>
                </div>
-            </div >
-         </Dialog >
+            </div>
+         </Dialog>
       </>
-   )
+   );
 }
 
 export default ProductViewModal;

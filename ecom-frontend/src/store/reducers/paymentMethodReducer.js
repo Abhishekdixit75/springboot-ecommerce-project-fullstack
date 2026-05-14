@@ -1,17 +1,17 @@
 const initialState = {
-    paymentMethod: "Stripe",
+   paymentMethod: 'Stripe',
 };
 
 const paymentMethodReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case "ADD_PAYMENT_METHOD":
-            return {
-                ...state,
-                paymentMethod: action.payload,
-            };
-        default:
-            return state;
-    }
+   switch (action.type) {
+      case 'ADD_PAYMENT_METHOD':
+         return {
+            ...state,
+            paymentMethod: action.payload,
+         };
+      default:
+         return state;
+   }
 };
 
 export default paymentMethodReducer;
