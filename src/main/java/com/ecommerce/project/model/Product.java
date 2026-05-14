@@ -4,14 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 // import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-// import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+// import org.springframework.stereotype.Service;
 
 @Entity
 @Data
@@ -20,31 +20,36 @@ import java.util.List;
 @Table(name = "products")
 @ToString
 public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long productId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long productId;
 
-    @NotBlank
-    @Size(min = 3, message = "Product Name must contain at-least 3 characters.")
-    private String productName;
-    private String image;
+  @NotBlank
+  @Size(min = 3, message = "Product Name must contain at-least 3 characters.")
+  private String productName;
 
-    @NotBlank
-    @Size(min = 6, message = "Product description must contain at-least 6 characters.")
-    private String description;
-    private Integer quantity;
-    private double price;
-    private double discount;
-    private double specialPrice;
+  private String image;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+  @NotBlank
+  @Size(min = 6, message = "Product description must contain at-least 6 characters.")
+  private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private User user;
+  private Integer quantity;
+  private double price;
+  private double discount;
+  private double specialPrice;
 
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    private List<CartItem> products = new ArrayList<>();
+  @ManyToOne
+  @JoinColumn(name = "category_id")
+  private Category category;
+
+  @ManyToOne
+  @JoinColumn(name = "seller_id")
+  private User user;
+
+  @OneToMany(
+      mappedBy = "product",
+      cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+      fetch = FetchType.EAGER)
+  private List<CartItem> products = new ArrayList<>();
 }

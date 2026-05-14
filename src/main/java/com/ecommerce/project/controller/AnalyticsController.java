@@ -15,16 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class AnalyticsController {
 
-    @Autowired
-    private AnalyticsService analyticsService;
-    @Autowired
-    private OrderService orderService;
+  @Autowired private AnalyticsService analyticsService;
+  @Autowired private OrderService orderService;
 
-    @GetMapping("admin/app/analytics")
-    public ResponseEntity<AnalyticsResponse> getAnalytics() {
-        AnalyticsResponse response = analyticsService.getAnalyticsData();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-
+  @GetMapping("admin/app/analytics")
+  public ResponseEntity<AnalyticsResponse> getAnalytics() {
+    AnalyticsResponse response = analyticsService.getAnalyticsData();
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
 }

@@ -1,21 +1,20 @@
 package com.ecommerce.project.payload;
 
-
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-// import org.apache.catalina.LifecycleState;
 
-import java.util.List;
+// import org.apache.catalina.LifecycleState;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryResponse {
-    private List<CategoryDTO> content;
-    private Integer pageNumber;
-    private Integer pageSize;
-    private Integer totalPages;
-    private Long totalElements;
-    private boolean lastPage;
+  private List<CategoryDTO> content;
+  private Integer pageNumber;
+  private Integer pageSize;
+  private Integer totalPages;
+  private Long totalElements;
+  private boolean lastPage;
 }

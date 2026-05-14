@@ -9,13 +9,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-//import java.util.List;
+// import java.util.List;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
-    Page<Product> findByCategoryOrderByPriceAsc(Category category, Pageable pageDetails);
+public interface ProductRepository
+    extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+  Page<Product> findByCategoryOrderByPriceAsc(Category category, Pageable pageDetails);
 
-    Page<Product> findByProductNameLikeIgnoreCase(String keyword, Pageable pageDetails);
+  Page<Product> findByProductNameLikeIgnoreCase(String keyword, Pageable pageDetails);
 
-    Page<Product> findByUser(User user, Pageable pageDetails);
+  Page<Product> findByUser(User user, Pageable pageDetails);
 }
