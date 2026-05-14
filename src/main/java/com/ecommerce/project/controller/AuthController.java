@@ -3,16 +3,16 @@ package com.ecommerce.project.controller;
 import com.ecommerce.project.config.AppConstants;
 import com.ecommerce.project.payload.AuthenticationResult;
 import com.ecommerce.project.payload.UserResponse;
-import com.ecommerce.project.security.jwt.JwtUtils;
+// import com.ecommerce.project.security.jwt.JwtUtils;
 import com.ecommerce.project.security.request.LoginRequest;
 import com.ecommerce.project.security.request.SignupRequest;
 import com.ecommerce.project.security.response.MessageResponse;
 import com.ecommerce.project.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+// import org.springframework.data.domain.PageRequest;
+// import org.springframework.data.domain.Pageable;
+// import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +51,6 @@ public class AuthController {
         }
     }
 
-
     @GetMapping("/user")
     public ResponseEntity<?> getUserDetails(Authentication authentication) {
         UserInfoResponse currentUserDetails = authService.getCurrentUserDetails(authentication);
@@ -67,10 +66,11 @@ public class AuthController {
     }
 
     @GetMapping("/sellers")
-    public ResponseEntity<UserResponse> getAllSellers(@RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
-                                                      @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
-                                                      @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_USERS_BY, required = false) String sortBy,
-                                                      @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
+    public ResponseEntity<UserResponse> getAllSellers(
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_USERS_BY, required = false) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
         return ResponseEntity.ok(authService.getAllSellers(pageNumber, pageSize, sortBy, sortOrder));
     }
 }

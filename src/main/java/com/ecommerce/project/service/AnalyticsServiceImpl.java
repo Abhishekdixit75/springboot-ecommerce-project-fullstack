@@ -1,10 +1,10 @@
 package com.ecommerce.project.service;
 
 import com.ecommerce.project.payload.AnalyticsResponse;
-import com.ecommerce.project.payload.ProductResponse;
+// import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.repositories.OrderRepository;
 import com.ecommerce.project.repositories.ProductRepository;
-import jakarta.persistence.Access;
+// import jakarta.persistence.Access;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
