@@ -1,4 +1,16 @@
 #!/bin/sh
-echo "🔍 Running pre-commit linting and formatting..."
-cd ecom-frontend && npx lint-staged
-echo "✅ Pre-commit checks passed!"
+set -e  # Exit immediately on any failure
+
+echo "🔍 Running pre-commit checks..."
+
+# Frontend checks
+echo "📦 Checking Frontend..."
+cd ecom-frontend || { echo "❌ ecom-frontend folder not found!"; exit 1; }
+npx lint-staged || { echo "❌ Frontend lint failed! Run 'npm run fix' to fix."; exit 1; }
+cd ..
+
+# Backend checks
+echo "☕ Formatting & Checking Backend..."
+./mvnw spotless:apply checkstyle:check || { echo "❌ Backend checks failed! Run './mvnw spotless:apply' to fix formatting."; exit 1; }
+
+echo "✅ All pre-commit checks passed!"

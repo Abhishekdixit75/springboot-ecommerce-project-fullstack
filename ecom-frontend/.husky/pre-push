@@ -1,4 +1,16 @@
 #!/bin/sh
-echo "🚀 Running full project lint check before push..."
-cd ecom-frontend && npm run lint
+set -e  # Exit immediately on any failure
+
+echo "🚀 Running full project check before push..."
+
+# Frontend full lint
+echo "📦 Linting Frontend..."
+cd ecom-frontend || { echo "❌ ecom-frontend folder not found!"; exit 1; }
+npm run lint || { echo "❌ Frontend lint failed! Run 'npm run lint:fix' to fix."; exit 1; }
+cd ..
+
+# Backend full lint
+echo "☕ Linting Backend (Checkstyle)..."
+./mvnw checkstyle:check || { echo "❌ Backend Checkstyle failed! Run './mvnw spotless:apply' to fix."; exit 1; }
+
 echo "✨ All clear! Pushing to remote..."
