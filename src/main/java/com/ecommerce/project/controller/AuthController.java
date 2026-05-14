@@ -24,55 +24,68 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-  @Autowired AuthService authService;
+    @Autowired AuthService authService;
 
-  @PostMapping("/signin")
-  public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-    AuthenticationResult result = authService.login(loginRequest);
+    @PostMapping("/signin")
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        AuthenticationResult result = authService.login(loginRequest);
 
-    return ResponseEntity.ok()
-        .header(HttpHeaders.SET_COOKIE, result.getJwtCookie().toString())
-        .body(result.getResponse());
-  }
-
-  @PostMapping("/signup")
-  public ResponseEntity<?> registerUser(@Valid() @RequestBody SignupRequest signupRequest) {
-    return authService.register(signupRequest);
-  }
-
-  @GetMapping("/username")
-  public String currentUserName(Authentication authentication) {
-    if (authentication != null) {
-      return authentication.getName();
-    } else {
-      return "NULL";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, result.getJwtCookie().toString())
+                .body(result.getResponse());
     }
-  }
 
-  @GetMapping("/user")
-  public ResponseEntity<?> getUserDetails(Authentication authentication) {
-    UserInfoResponse currentUserDetails = authService.getCurrentUserDetails(authentication);
-    return ResponseEntity.ok().body(currentUserDetails);
-  }
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@Valid() @RequestBody SignupRequest signupRequest) {
+        return authService.register(signupRequest);
+    }
 
-  @PostMapping("/signout")
-  public ResponseEntity<?> signoutUser() {
-    ResponseCookie cookie = authService.logout();
-    return ResponseEntity.ok()
-        .header(HttpHeaders.SET_COOKIE, cookie.toString())
-        .body(new MessageResponse("You have been signed out"));
-  }
+    @GetMapping("/username")
+    public String currentUserName(Authentication authentication) {
+        if (authentication != null) {
+            return authentication.getName();
+        } else {
+            return "NULL";
+        }
+    }
 
-  @GetMapping("/sellers")
-  public ResponseEntity<UserResponse> getAllSellers(
-      @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false)
-          Integer pageNumber,
-      @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false)
-          Integer pageSize,
-      @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_USERS_BY, required = false)
-          String sortBy,
-      @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false)
-          String sortOrder) {
-    return ResponseEntity.ok(authService.getAllSellers(pageNumber, pageSize, sortBy, sortOrder));
-  }
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserDetails(Authentication authentication) {
+        UserInfoResponse currentUserDetails = authService.getCurrentUserDetails(authentication);
+        return ResponseEntity.ok().body(currentUserDetails);
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<?> signoutUser() {
+        ResponseCookie cookie = authService.logout();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new MessageResponse("You have been signed out"));
+    }
+
+    @GetMapping("/sellers")
+    public ResponseEntity<UserResponse> getAllSellers(
+            @RequestParam(
+                            name = "pageNumber",
+                            defaultValue = AppConstants.PAGE_NUMBER,
+                            required = false)
+                    Integer pageNumber,
+            @RequestParam(
+                            name = "pageSize",
+                            defaultValue = AppConstants.PAGE_SIZE,
+                            required = false)
+                    Integer pageSize,
+            @RequestParam(
+                            name = "sortBy",
+                            defaultValue = AppConstants.SORT_USERS_BY,
+                            required = false)
+                    String sortBy,
+            @RequestParam(
+                            name = "sortOrder",
+                            defaultValue = AppConstants.SORT_DIR,
+                            required = false)
+                    String sortOrder) {
+        return ResponseEntity.ok(
+                authService.getAllSellers(pageNumber, pageSize, sortBy, sortOrder));
+    }
 }

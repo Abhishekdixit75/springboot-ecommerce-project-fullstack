@@ -11,19 +11,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
-  @Autowired UserRepository userRepository;
+    @Autowired UserRepository userRepository;
 
-  @Override
-  @Transactional
-  // this makes sure that the entire operation on the database is handled as a transaction (ie,
-  // either the operation is fully successful or it is rollback)
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user =
-        userRepository
-            .findByUserName(username)
-            .orElseThrow(
-                () -> new UsernameNotFoundException("User not found with username : " + username));
+    @Override
+    @Transactional
+    // this makes sure that the entire operation on the database is handled as a transaction (ie,
+    // either the operation is fully successful or it is rollback)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user =
+                userRepository
+                        .findByUserName(username)
+                        .orElseThrow(
+                                () ->
+                                        new UsernameNotFoundException(
+                                                "User not found with username : " + username));
 
-    return UserDetailsImpl.build(user);
-  }
+        return UserDetailsImpl.build(user);
+    }
 }

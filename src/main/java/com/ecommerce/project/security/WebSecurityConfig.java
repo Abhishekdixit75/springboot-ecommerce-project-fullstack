@@ -33,179 +33,196 @@ import org.springframework.transaction.support.TransactionTemplate;
 @EnableWebSecurity
 // @EnableMethodSecurity
 public class WebSecurityConfig {
-  @Autowired UserDetailServiceImpl userDetailService;
+    @Autowired UserDetailServiceImpl userDetailService;
 
-  @Autowired private AuthEntryPointJwt unauthorizedHandler;
+    @Autowired private AuthEntryPointJwt unauthorizedHandler;
 
-  @Autowired private AuthTokenFilter authTokenFilter;
+    @Autowired private AuthTokenFilter authTokenFilter;
 
-  @Autowired private PlatformTransactionManager transactionManager;
+    @Autowired private PlatformTransactionManager transactionManager;
 
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-    authenticationProvider.setUserDetailsService(userDetailService);
-    authenticationProvider.setPasswordEncoder(passwordEncoder());
-    return authenticationProvider;
-  }
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
+    }
 
-  @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
-      throws Exception {
-    return authConfig.getAuthenticationManager();
-  }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+            throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-  @Bean
-  SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.cors(cors -> {})
-        .csrf(csrf -> csrf.disable())
-        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-        .sessionManagement(
-            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(HttpMethod.OPTIONS, "/**")
-                    .permitAll()
-                    .requestMatchers("/api/auth/**")
-                    .permitAll()
-                    .requestMatchers("/api/admin/**")
-                    .hasRole("ADMIN") // spring security will automatically prepend the 'ADMIN' with
-                    // 'ROLE_', so it will become as 'ROLE_ADMIN'
-                    .requestMatchers("api/seller/**")
-                    .hasAnyRole("ADMIN", "SELLER")
-                    .requestMatchers("/v3/api-docs/**")
-                    .permitAll()
-                    .requestMatchers("/h2-console/**")
-                    .permitAll()
-                    .requestMatchers("/swagger-ui/**")
-                    .permitAll()
-                    .requestMatchers("/api/public/**")
-                    .permitAll()
-                    //                        .requestMatchers("/api/admin/**").permitAll()
-                    .requestMatchers("/swagger-ui/**")
-                    .permitAll()
-                    .requestMatchers("/images/**")
-                    .permitAll()
-                    .requestMatchers("/actuator/**")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated());
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors(cors -> {})
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(
+                        exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.requestMatchers(HttpMethod.OPTIONS, "/**")
+                                        .permitAll()
+                                        .requestMatchers("/api/auth/**")
+                                        .permitAll()
+                                        .requestMatchers("/api/admin/**")
+                                        .hasRole("ADMIN") // spring security will automatically
+                                        // prepend the 'ADMIN' with
+                                        // 'ROLE_', so it will become as 'ROLE_ADMIN'
+                                        .requestMatchers("api/seller/**")
+                                        .hasAnyRole("ADMIN", "SELLER")
+                                        .requestMatchers("/v3/api-docs/**")
+                                        .permitAll()
+                                        .requestMatchers("/h2-console/**")
+                                        .permitAll()
+                                        .requestMatchers("/swagger-ui/**")
+                                        .permitAll()
+                                        .requestMatchers("/api/public/**")
+                                        .permitAll()
+                                        //
+                                        // .requestMatchers("/api/admin/**").permitAll()
+                                        .requestMatchers("/swagger-ui/**")
+                                        .permitAll()
+                                        .requestMatchers("/images/**")
+                                        .permitAll()
+                                        .requestMatchers("/actuator/**")
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated());
 
-    http.authenticationProvider(authenticationProvider());
-    http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
-    http.headers(
-        headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.sameOrigin()));
+        http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.headers(
+                headers ->
+                        headers.frameOptions(
+                                frameOptionsConfig -> frameOptionsConfig.sameOrigin()));
 
-    return http.build();
-  }
+        return http.build();
+    }
 
-  @Bean // using this method, to completely bypass the spring security at global level
-  // in the above filter chain, we are defining the rules, that is - the APIs will go to spring
-  // security & then spring security will decide what to do with that end point
-  // whereas, here the APIs defined will not even go to the Spring Security
-  public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web ->
-        web.ignoring()
-            .requestMatchers(
-                "/v2/api-docs",
-                "webjars/**",
-                "/configuration/ui",
-                "/configuration/security",
-                "/swagger-resources/**",
-                "swagger-ui.html"));
-  }
+    @Bean // using this method, to completely bypass the spring security at global level
+    // in the above filter chain, we are defining the rules, that is - the APIs will go to spring
+    // security & then spring security will decide what to do with that end point
+    // whereas, here the APIs defined will not even go to the Spring Security
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web ->
+                web.ignoring()
+                        .requestMatchers(
+                                "/v2/api-docs",
+                                "webjars/**",
+                                "/configuration/ui",
+                                "/configuration/security",
+                                "/swagger-resources/**",
+                                "swagger-ui.html"));
+    }
 
-  @Bean
-  public CommandLineRunner initData(
-      RoleRepository roleRepository,
-      UserRepository userRepository,
-      PasswordEncoder passwordEncoder) {
-    return args -> {
-      TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-      transactionTemplate.execute(
-          status -> {
-            // Retrieve or create roles
-            Role userRole =
-                roleRepository
-                    .findByRoleName(AppRole.ROLE_USER)
-                    .orElseGet(
-                        () -> {
-                          Role newUserRole = new Role(AppRole.ROLE_USER);
-                          return roleRepository.save(newUserRole);
-                        });
+    @Bean
+    public CommandLineRunner initData(
+            RoleRepository roleRepository,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
+        return args -> {
+            TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+            transactionTemplate.execute(
+                    status -> {
+                        // Retrieve or create roles
+                        Role userRole =
+                                roleRepository
+                                        .findByRoleName(AppRole.ROLE_USER)
+                                        .orElseGet(
+                                                () -> {
+                                                    Role newUserRole = new Role(AppRole.ROLE_USER);
+                                                    return roleRepository.save(newUserRole);
+                                                });
 
-            Role sellerRole =
-                roleRepository
-                    .findByRoleName(AppRole.ROLE_SELLER)
-                    .orElseGet(
-                        () -> {
-                          Role newSellerRole = new Role(AppRole.ROLE_SELLER);
-                          return roleRepository.save(newSellerRole);
-                        });
+                        Role sellerRole =
+                                roleRepository
+                                        .findByRoleName(AppRole.ROLE_SELLER)
+                                        .orElseGet(
+                                                () -> {
+                                                    Role newSellerRole =
+                                                            new Role(AppRole.ROLE_SELLER);
+                                                    return roleRepository.save(newSellerRole);
+                                                });
 
-            Role adminRole =
-                roleRepository
-                    .findByRoleName(AppRole.ROLE_ADMIN)
-                    .orElseGet(
-                        () -> {
-                          Role newAdminRole = new Role(AppRole.ROLE_ADMIN);
-                          return roleRepository.save(newAdminRole);
-                        });
+                        Role adminRole =
+                                roleRepository
+                                        .findByRoleName(AppRole.ROLE_ADMIN)
+                                        .orElseGet(
+                                                () -> {
+                                                    Role newAdminRole =
+                                                            new Role(AppRole.ROLE_ADMIN);
+                                                    return roleRepository.save(newAdminRole);
+                                                });
 
-            Set<Role> userRoles = new HashSet<>(Set.of(userRole));
-            Set<Role> sellerRoles = new HashSet<>(Set.of(sellerRole));
-            Set<Role> adminRoles = new HashSet<>(Set.of(userRole, sellerRole, adminRole));
+                        Set<Role> userRoles = new HashSet<>(Set.of(userRole));
+                        Set<Role> sellerRoles = new HashSet<>(Set.of(sellerRole));
+                        Set<Role> adminRoles =
+                                new HashSet<>(Set.of(userRole, sellerRole, adminRole));
 
-            // Create users if not already present
-            if (!userRepository.existsByUserName("user1")) {
-              User user1 =
-                  new User("user1", passwordEncoder.encode("password1"), "user1@example.com");
-              userRepository.save(user1);
-            }
+                        // Create users if not already present
+                        if (!userRepository.existsByUserName("user1")) {
+                            User user1 =
+                                    new User(
+                                            "user1",
+                                            passwordEncoder.encode("password1"),
+                                            "user1@example.com");
+                            userRepository.save(user1);
+                        }
 
-            if (!userRepository.existsByUserName("seller1")) {
-              User seller1 =
-                  new User("seller1", passwordEncoder.encode("password2"), "seller1@example.com");
-              userRepository.save(seller1);
-            }
+                        if (!userRepository.existsByUserName("seller1")) {
+                            User seller1 =
+                                    new User(
+                                            "seller1",
+                                            passwordEncoder.encode("password2"),
+                                            "seller1@example.com");
+                            userRepository.save(seller1);
+                        }
 
-            if (!userRepository.existsByUserName("admin")) {
-              User admin =
-                  new User("admin", passwordEncoder.encode("adminPass"), "admin@example.com");
-              userRepository.save(admin);
-            }
+                        if (!userRepository.existsByUserName("admin")) {
+                            User admin =
+                                    new User(
+                                            "admin",
+                                            passwordEncoder.encode("adminPass"),
+                                            "admin@example.com");
+                            userRepository.save(admin);
+                        }
 
-            // Update roles for existing users
-            userRepository
-                .findByUserName("user1")
-                .ifPresent(
-                    user -> {
-                      user.setRoles(userRoles);
-                      userRepository.save(user);
+                        // Update roles for existing users
+                        userRepository
+                                .findByUserName("user1")
+                                .ifPresent(
+                                        user -> {
+                                            user.setRoles(userRoles);
+                                            userRepository.save(user);
+                                        });
+
+                        userRepository
+                                .findByUserName("seller1")
+                                .ifPresent(
+                                        seller -> {
+                                            seller.setRoles(sellerRoles);
+                                            userRepository.save(seller);
+                                        });
+
+                        userRepository
+                                .findByUserName("admin")
+                                .ifPresent(
+                                        admin -> {
+                                            admin.setRoles(adminRoles);
+                                            userRepository.save(admin);
+                                        });
+                        return null;
                     });
-
-            userRepository
-                .findByUserName("seller1")
-                .ifPresent(
-                    seller -> {
-                      seller.setRoles(sellerRoles);
-                      userRepository.save(seller);
-                    });
-
-            userRepository
-                .findByUserName("admin")
-                .ifPresent(
-                    admin -> {
-                      admin.setRoles(adminRoles);
-                      userRepository.save(admin);
-                    });
-            return null;
-          });
-    };
-  }
+        };
+    }
 }

@@ -13,33 +13,37 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-  @Bean
-  public OpenAPI customOpenAPI() {
-    SecurityScheme bearerScheme =
-        new SecurityScheme()
-            .type(SecurityScheme.Type.HTTP)
-            .scheme("bearer")
-            .bearerFormat("JWT")
-            .description("JWT Bearer Token");
+    @Bean
+    public OpenAPI customOpenAPI() {
+        SecurityScheme bearerScheme =
+                new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("JWT Bearer Token");
 
-    SecurityRequirement bearerRequirement =
-        new SecurityRequirement().addList("Bearer Authentication");
+        SecurityRequirement bearerRequirement =
+                new SecurityRequirement().addList("Bearer Authentication");
 
-    return new OpenAPI()
-        .info(
-            new Info()
-                .title("Spring Boot eCommerce API")
-                .version("1.0")
-                .description("This is a Spring Boot Project for eCommerce")
-                .license(new License().name("Apache 2.0").url("http://google.com"))
-                .contact(new Contact().name("Abhishek Dixit").email("abhishekdixit8228@gmail.com")))
-        .externalDocs(
-            new ExternalDocumentation()
-                .description("Project Documentation")
-                .url("http://embarkx.com"))
-        .components(new Components().addSecuritySchemes("Bearer Authentication", bearerScheme))
-        .addSecurityItem(bearerRequirement);
-  }
+        return new OpenAPI()
+                .info(
+                        new Info()
+                                .title("Spring Boot eCommerce API")
+                                .version("1.0")
+                                .description("This is a Spring Boot Project for eCommerce")
+                                .license(new License().name("Apache 2.0").url("http://google.com"))
+                                .contact(
+                                        new Contact()
+                                                .name("Abhishek Dixit")
+                                                .email("abhishekdixit8228@gmail.com")))
+                .externalDocs(
+                        new ExternalDocumentation()
+                                .description("Project Documentation")
+                                .url("http://embarkx.com"))
+                .components(
+                        new Components().addSecuritySchemes("Bearer Authentication", bearerScheme))
+                .addSecurityItem(bearerRequirement);
+    }
 }
    /*   | Term                     | Simple meaning                                               |
         | ------------------------ | -------------------------------------------------------------|

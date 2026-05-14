@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-  private Long userId;
-  private String username;
-  private String email;
-  private Set<Role> roles = new HashSet<>();
-  private AddressDTO address;
-  private CartDTO cart;
+    private Long userId;
+    private String username;
+    private String email;
+    private Set<Role> roles = new HashSet<>();
+    private AddressDTO address;
+    private CartDTO cart;
 }

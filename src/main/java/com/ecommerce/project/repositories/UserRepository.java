@@ -13,12 +13,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-  Optional<User> findByUserName(String username);
+    Optional<User> findByUserName(String username);
 
-  Boolean existsByUserName(String username);
+    Boolean existsByUserName(String username);
 
-  Boolean existsByEmail(String email);
+    Boolean existsByEmail(String email);
 
-  @Query("SELECT u from User u join u.roles r where r.roleName = :role")
-  Page<User> findByRoleName(@Param("role") AppRole appRole, Pageable pageDetails);
+    @Query("SELECT u from User u join u.roles r where r.roleName = :role")
+    Page<User> findByRoleName(@Param("role") AppRole appRole, Pageable pageDetails);
 }

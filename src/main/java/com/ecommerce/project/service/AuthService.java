@@ -12,13 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
 public interface AuthService {
-  AuthenticationResult login(LoginRequest loginRequest);
+    AuthenticationResult login(LoginRequest loginRequest);
 
-  ResponseEntity<MessageResponse> register(@Valid() SignupRequest signupRequest);
+    ResponseEntity<MessageResponse> register(@Valid() SignupRequest signupRequest);
 
-  UserInfoResponse getCurrentUserDetails(Authentication authentication);
+    UserInfoResponse getCurrentUserDetails(Authentication authentication);
 
-  ResponseCookie logout();
+    ResponseCookie logout();
 
-  UserResponse getAllSellers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    UserResponse getAllSellers(
+            Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 }

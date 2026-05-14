@@ -18,57 +18,57 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class CartServiceImplTest {
 
-  @Mock private CartRepository cartRepository;
+    @Mock private CartRepository cartRepository;
 
-  @Mock private AuthUtil authUtil;
+    @Mock private AuthUtil authUtil;
 
-  @InjectMocks private CartServiceImpl cartService;
+    @InjectMocks private CartServiceImpl cartService;
 
-  @Test
-  void testCreateCartReturnsExistingCart()
-      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    Cart existingCart = new Cart();
-    existingCart.setCartId(1L);
-    existingCart.setTotalPrice(12.33);
+    @Test
+    void testCreateCartReturnsExistingCart()
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Cart existingCart = new Cart();
+        existingCart.setCartId(1L);
+        existingCart.setTotalPrice(12.33);
 
-    String email = "pseudoemail@gmail.com";
+        String email = "pseudoemail@gmail.com";
 
-    when(authUtil.loggedInEmail()).thenReturn(email);
-    when(cartRepository.findCartByEmail(authUtil.loggedInEmail())).thenReturn(existingCart);
+        when(authUtil.loggedInEmail()).thenReturn(email);
+        when(cartRepository.findCartByEmail(authUtil.loggedInEmail())).thenReturn(existingCart);
 
-    // this is 'Reflections'
-    Method createCart = CartServiceImpl.class.getDeclaredMethod("createCart");
-    createCart.setAccessible(true); // for giving the access of the private method in here
+        // this is 'Reflections'
+        Method createCart = CartServiceImpl.class.getDeclaredMethod("createCart");
+        createCart.setAccessible(true); // for giving the access of the private method in here
 
-    // calling the actual method
-    Cart createdCart = (Cart) createCart.invoke(cartService);
+        // calling the actual method
+        Cart createdCart = (Cart) createCart.invoke(cartService);
 
-    // assertions and verifications
-    assertNotNull(createdCart);
-    assertEquals(existingCart, createdCart);
-    verify(cartRepository).findCartByEmail(email);
-    verify(cartRepository, never()).save(any(Cart.class));
-  }
+        // assertions and verifications
+        assertNotNull(createdCart);
+        assertEquals(existingCart, createdCart);
+        verify(cartRepository).findCartByEmail(email);
+        verify(cartRepository, never()).save(any(Cart.class));
+    }
 
-  @Test
-  void testCreateCartReturnsNewCart()
-      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    String email = "pseudoemail@gmail.com";
-    Cart cart = new Cart();
-    cart.setTotalPrice(0.00);
+    @Test
+    void testCreateCartReturnsNewCart()
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String email = "pseudoemail@gmail.com";
+        Cart cart = new Cart();
+        cart.setTotalPrice(0.00);
 
-    when(authUtil.loggedInEmail()).thenReturn(email);
-    when(cartRepository.findCartByEmail(authUtil.loggedInEmail())).thenReturn(null);
-    when(cartRepository.save(cart)).thenReturn(cart);
+        when(authUtil.loggedInEmail()).thenReturn(email);
+        when(cartRepository.findCartByEmail(authUtil.loggedInEmail())).thenReturn(null);
+        when(cartRepository.save(cart)).thenReturn(cart);
 
-    Method createCart = CartServiceImpl.class.getDeclaredMethod("createCart");
-    createCart.setAccessible(true); // for giving the access of the private method
+        Method createCart = CartServiceImpl.class.getDeclaredMethod("createCart");
+        createCart.setAccessible(true); // for giving the access of the private method
 
-    Cart createdCart = (Cart) createCart.invoke(cartService);
+        Cart createdCart = (Cart) createCart.invoke(cartService);
 
-    assertNotNull(createdCart);
-    assertEquals(cart.getTotalPrice(), createdCart.getTotalPrice());
-    verify(cartRepository, times(1)).findCartByEmail(email);
-    verify(cartRepository, times(1)).save(any(Cart.class));
-  }
+        assertNotNull(createdCart);
+        assertEquals(cart.getTotalPrice(), createdCart.getTotalPrice());
+        verify(cartRepository, times(1)).findCartByEmail(email);
+        verify(cartRepository, times(1)).save(any(Cart.class));
+    }
 }

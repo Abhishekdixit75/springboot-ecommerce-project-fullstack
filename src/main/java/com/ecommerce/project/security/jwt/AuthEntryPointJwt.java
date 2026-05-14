@@ -16,33 +16,33 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
-  // 'AuthenticationEntryPoint' is used here to modify the response that the user gets when its
-  // request is unauthenticated
+    // 'AuthenticationEntryPoint' is used here to modify the response that the user gets when its
+    // request is unauthenticated
 
-  private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
-  // This method is called automatically whenever authentication fails.
-  @Override
-  public void commence(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      AuthenticationException authException)
-      throws IOException, ServletException {
-    logger.error("Unauthorized error : {}", authException.getMessage());
-    response.setContentType(
-        MediaType
-            .APPLICATION_JSON_VALUE); // Ensures client gets JSON instead of HTML or plain text.
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Returns 401 Unauthorized.
+    // This method is called automatically whenever authentication fails.
+    @Override
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authException)
+            throws IOException, ServletException {
+        logger.error("Unauthorized error : {}", authException.getMessage());
+        response.setContentType(
+                MediaType.APPLICATION_JSON_VALUE); // Ensures client gets JSON instead of HTML or
+        // plain text.
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Returns 401 Unauthorized.
 
-    // Building a JSON response body
-    final Map<String, Object> body = new HashMap<>();
-    body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-    body.put("error", "Unauthorized");
-    body.put("message", authException.getMessage());
-    body.put("path", request.getServletPath());
+        // Building a JSON response body
+        final Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        body.put("error", "Unauthorized");
+        body.put("message", authException.getMessage());
+        body.put("path", request.getServletPath());
 
-    // Writing JSON to response
-    final ObjectMapper mapper = new ObjectMapper();
-    mapper.writeValue(response.getOutputStream(), body);
-  }
+        // Writing JSON to response
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getOutputStream(), body);
+    }
 }

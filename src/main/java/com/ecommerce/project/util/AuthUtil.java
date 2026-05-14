@@ -11,44 +11,47 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthUtil {
 
-  @Autowired UserRepository userRepository;
+    @Autowired UserRepository userRepository;
 
-  public String loggedInEmail() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    User user =
-        userRepository
-            .findByUserName(authentication.getName())
-            .orElseThrow(
-                () ->
-                    new UsernameNotFoundException(
-                        "User Not Found With Username : " + authentication.getName()));
+    public String loggedInEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user =
+                userRepository
+                        .findByUserName(authentication.getName())
+                        .orElseThrow(
+                                () ->
+                                        new UsernameNotFoundException(
+                                                "User Not Found With Username : "
+                                                        + authentication.getName()));
 
-    return user.getEmail();
-  }
+        return user.getEmail();
+    }
 
-  public Long loggedInUserId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    User user =
-        userRepository
-            .findByUserName(authentication.getName())
-            .orElseThrow(
-                () ->
-                    new UsernameNotFoundException(
-                        "User Not Found With Username : " + authentication.getName()));
+    public Long loggedInUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user =
+                userRepository
+                        .findByUserName(authentication.getName())
+                        .orElseThrow(
+                                () ->
+                                        new UsernameNotFoundException(
+                                                "User Not Found With Username : "
+                                                        + authentication.getName()));
 
-    return user.getUserId();
-  }
+        return user.getUserId();
+    }
 
-  public User loggedInUser() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    User user =
-        userRepository
-            .findByUserName(authentication.getName())
-            .orElseThrow(
-                () ->
-                    new UsernameNotFoundException(
-                        "User Not Found With Username : " + authentication.getName()));
+    public User loggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user =
+                userRepository
+                        .findByUserName(authentication.getName())
+                        .orElseThrow(
+                                () ->
+                                        new UsernameNotFoundException(
+                                                "User Not Found With Username : "
+                                                        + authentication.getName()));
 
-    return user;
-  }
+        return user;
+    }
 }

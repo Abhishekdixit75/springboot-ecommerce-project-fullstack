@@ -22,303 +22,327 @@ import org.springframework.stereotype.Service;
 @Service
 public class CartServiceImpl implements CartService {
 
-  @Autowired ModelMapper modelMapper;
+    @Autowired ModelMapper modelMapper;
 
-  @Autowired CartRepository cartRepository;
+    @Autowired CartRepository cartRepository;
 
-  @Autowired AuthUtil authUtil;
+    @Autowired AuthUtil authUtil;
 
-  @Autowired ProductRepository productRepository;
+    @Autowired ProductRepository productRepository;
 
-  @Autowired CartItemRepository cartItemRepository;
+    @Autowired CartItemRepository cartItemRepository;
 
-  @Override
-  public CartDTO addProductToCart(Long productId, Integer quantity) {
-    // find existing cart or create one
-    Cart cart = createCart();
+    @Override
+    public CartDTO addProductToCart(Long productId, Integer quantity) {
+        // find existing cart or create one
+        Cart cart = createCart();
 
-    // Retrieve product details
-    Product product =
-        productRepository
-            .findById(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+        // Retrieve product details
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Product", "productId", productId));
 
-    // Perform validations
-    CartItem cartItem =
-        cartItemRepository.findCartItemByProductIdAndCartId(cart.getCartId(), productId);
-    if (cartItem != null) {
-      throw new APIException("Product " + product.getProductName() + " already exists in cart");
-    } // checking if the product exists in the cart or not
-    if (product.getQuantity() == 0) {
-      throw new APIException(product.getProductName() + " is not available");
-    } // checking if the product is available or not
-    if (product.getQuantity() < quantity) {
-      throw new APIException(
-          "Please, make an order of the "
-              + product.getProductName()
-              + " less than or equal to the quantity "
-              + product.getQuantity());
-    } // checking if the demand is under the available stock amount or not
+        // Perform validations
+        CartItem cartItem =
+                cartItemRepository.findCartItemByProductIdAndCartId(cart.getCartId(), productId);
+        if (cartItem != null) {
+            throw new APIException(
+                    "Product " + product.getProductName() + " already exists in cart");
+        } // checking if the product exists in the cart or not
+        if (product.getQuantity() == 0) {
+            throw new APIException(product.getProductName() + " is not available");
+        } // checking if the product is available or not
+        if (product.getQuantity() < quantity) {
+            throw new APIException(
+                    "Please, make an order of the "
+                            + product.getProductName()
+                            + " less than or equal to the quantity "
+                            + product.getQuantity());
+        } // checking if the demand is under the available stock amount or not
 
-    // create cart items
-    CartItem newCartItem = new CartItem();
-    newCartItem.setProduct(product);
-    newCartItem.setCart(cart);
-    newCartItem.setQuantity(quantity);
-    newCartItem.setDiscount(product.getDiscount());
-    newCartItem.setProductPrice(product.getSpecialPrice());
+        // create cart items
+        CartItem newCartItem = new CartItem();
+        newCartItem.setProduct(product);
+        newCartItem.setCart(cart);
+        newCartItem.setQuantity(quantity);
+        newCartItem.setDiscount(product.getDiscount());
+        newCartItem.setProductPrice(product.getSpecialPrice());
 
-    // save cart items
-    cartItemRepository.save(newCartItem);
-    product.setQuantity(product.getQuantity());
-    cart.setTotalPrice(cart.getTotalPrice() + (product.getSpecialPrice() * quantity));
-    cartRepository.save(cart);
-    cart.getCartItems().add(newCartItem);
-    cartRepository.save(cart);
+        // save cart items
+        cartItemRepository.save(newCartItem);
+        product.setQuantity(product.getQuantity());
+        cart.setTotalPrice(cart.getTotalPrice() + (product.getSpecialPrice() * quantity));
+        cartRepository.save(cart);
+        cart.getCartItems().add(newCartItem);
+        cartRepository.save(cart);
 
-    // return updated cart
-    CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+        // return updated cart
+        CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
 
-    List<CartItem> cartItems = cart.getCartItems();
-    Stream<ProductDTO> productStream =
-        cartItems.stream()
-            .map(
-                item -> {
-                  ProductDTO map = modelMapper.map(item.getProduct(), ProductDTO.class);
-                  map.setQuantity(item.getQuantity());
-                  return map;
-                });
+        List<CartItem> cartItems = cart.getCartItems();
+        Stream<ProductDTO> productStream =
+                cartItems.stream()
+                        .map(
+                                item -> {
+                                    ProductDTO map =
+                                            modelMapper.map(item.getProduct(), ProductDTO.class);
+                                    map.setQuantity(item.getQuantity());
+                                    return map;
+                                });
 
-    cartDTO.setProducts(productStream.toList());
-    return cartDTO;
-  }
-
-  @Override
-  public List<CartDTO> getAllCarts() {
-    List<Cart> carts = cartRepository.findAll();
-    if (carts.isEmpty()) {
-      throw new APIException("No Carts Exist");
+        cartDTO.setProducts(productStream.toList());
+        return cartDTO;
     }
 
-    List<CartDTO> cartDTOs =
-        carts.stream()
-            .map(
-                cart -> {
-                  CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
-                  List<ProductDTO> products =
-                      cart.getCartItems().stream()
-                          .map(
-                              cartItem -> {
-                                ProductDTO productDTO =
-                                    modelMapper.map(cartItem.getProduct(), ProductDTO.class);
-                                productDTO.setQuantity(cartItem.getQuantity());
-                                return productDTO;
-                              })
-                          .toList();
+    @Override
+    public List<CartDTO> getAllCarts() {
+        List<Cart> carts = cartRepository.findAll();
+        if (carts.isEmpty()) {
+            throw new APIException("No Carts Exist");
+        }
 
-                  cartDTO.setProducts(products);
-                  return cartDTO;
-                })
-            .toList();
-    return cartDTOs;
-  }
+        List<CartDTO> cartDTOs =
+                carts.stream()
+                        .map(
+                                cart -> {
+                                    CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+                                    List<ProductDTO> products =
+                                            cart.getCartItems().stream()
+                                                    .map(
+                                                            cartItem -> {
+                                                                ProductDTO productDTO =
+                                                                        modelMapper.map(
+                                                                                cartItem
+                                                                                        .getProduct(),
+                                                                                ProductDTO.class);
+                                                                productDTO.setQuantity(
+                                                                        cartItem.getQuantity());
+                                                                return productDTO;
+                                                            })
+                                                    .toList();
 
-  @Override
-  public CartDTO getCart(String emailId, Long cartId) {
-    Cart cart = cartRepository.findCartByEmailAndCartId(emailId, cartId);
-    if (cart == null) {
-      throw new ResourceNotFoundException("Cart", "cartId", cartId);
-    }
-    CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
-    cart.getCartItems().forEach(c -> c.getProduct().setQuantity(c.getQuantity()));
-    List<ProductDTO> products =
-        cart.getCartItems().stream()
-            .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
-            .toList();
-    cartDTO.setProducts(products);
-
-    return cartDTO;
-  }
-
-  @Transactional
-  @Override
-  public CartDTO updateProductQuantityInCart(Long productId, Integer quantity) {
-    // getting the cart & product
-    String emailId = authUtil.loggedInEmail();
-    Cart userCart = cartRepository.findCartByEmail(emailId);
-    Long cartId = userCart.getCartId();
-
-    Cart cart =
-        cartRepository
-            .findById(cartId)
-            .orElseThrow(() -> new ResourceNotFoundException("Cart", " cartId", cartId));
-    Product product =
-        productRepository
-            .findById(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-
-    if (product.getQuantity() == 0) {
-      throw new APIException(product.getProductName() + " is not available");
-    } // checking if the product is available or not
-    if (product.getQuantity() < quantity) {
-      throw new APIException(
-          "Please, make an order of the "
-              + product.getProductName()
-              + " less than or equal to the quantity "
-              + product.getQuantity());
-    } // checking if the demand is under the available stock amount or not
-
-    CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
-    if (cartItem == null) {
-      throw new APIException("Product " + product.getProductName() + " not available in the cart");
+                                    cartDTO.setProducts(products);
+                                    return cartDTO;
+                                })
+                        .toList();
+        return cartDTOs;
     }
 
-    int newQuantity = cartItem.getQuantity() + quantity;
+    @Override
+    public CartDTO getCart(String emailId, Long cartId) {
+        Cart cart = cartRepository.findCartByEmailAndCartId(emailId, cartId);
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart", "cartId", cartId);
+        }
+        CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+        cart.getCartItems().forEach(c -> c.getProduct().setQuantity(c.getQuantity()));
+        List<ProductDTO> products =
+                cart.getCartItems().stream()
+                        .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
+                        .toList();
+        cartDTO.setProducts(products);
 
-    if (newQuantity < 0) {
-      throw new APIException("The Resulting Quantity can't be negative.");
+        return cartDTO;
     }
 
-    if (newQuantity == 0) {
-      deleteProductFromCart(cartId, productId);
-    } else {
-      // updating the product quantity in the cart
-      cartItem.setProductPrice(product.getSpecialPrice());
-      cartItem.setQuantity(cartItem.getQuantity() + quantity);
-      cartItem.setDiscount(product.getDiscount());
-      cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductPrice() * quantity));
-      cartRepository.save(cart);
+    @Transactional
+    @Override
+    public CartDTO updateProductQuantityInCart(Long productId, Integer quantity) {
+        // getting the cart & product
+        String emailId = authUtil.loggedInEmail();
+        Cart userCart = cartRepository.findCartByEmail(emailId);
+        Long cartId = userCart.getCartId();
+
+        Cart cart =
+                cartRepository
+                        .findById(cartId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException("Cart", " cartId", cartId));
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Product", "productId", productId));
+
+        if (product.getQuantity() == 0) {
+            throw new APIException(product.getProductName() + " is not available");
+        } // checking if the product is available or not
+        if (product.getQuantity() < quantity) {
+            throw new APIException(
+                    "Please, make an order of the "
+                            + product.getProductName()
+                            + " less than or equal to the quantity "
+                            + product.getQuantity());
+        } // checking if the demand is under the available stock amount or not
+
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
+        if (cartItem == null) {
+            throw new APIException(
+                    "Product " + product.getProductName() + " not available in the cart");
+        }
+
+        int newQuantity = cartItem.getQuantity() + quantity;
+
+        if (newQuantity < 0) {
+            throw new APIException("The Resulting Quantity can't be negative.");
+        }
+
+        if (newQuantity == 0) {
+            deleteProductFromCart(cartId, productId);
+        } else {
+            // updating the product quantity in the cart
+            cartItem.setProductPrice(product.getSpecialPrice());
+            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+            cartItem.setDiscount(product.getDiscount());
+            cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductPrice() * quantity));
+            cartRepository.save(cart);
+        }
+
+        CartItem updatedItem = cartItemRepository.save(cartItem);
+        if (updatedItem.getQuantity() == 0) {
+            cartItemRepository.deleteById(updatedItem.getCartItemId());
+        }
+
+        CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+        List<CartItem> cartItems = cart.getCartItems();
+
+        Stream<ProductDTO> productStream =
+                cartItems.stream()
+                        .map(
+                                item -> {
+                                    ProductDTO prod =
+                                            modelMapper.map(item.getProduct(), ProductDTO.class);
+                                    prod.setQuantity(item.getQuantity());
+                                    return prod;
+                                });
+
+        cartDTO.setProducts(productStream.toList());
+        return cartDTO;
     }
 
-    CartItem updatedItem = cartItemRepository.save(cartItem);
-    if (updatedItem.getQuantity() == 0) {
-      cartItemRepository.deleteById(updatedItem.getCartItemId());
+    @Transactional
+    @Override
+    public String deleteProductFromCart(Long cartId, Long productId) {
+        Cart cart =
+                cartRepository
+                        .findById(cartId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
+
+        if (cartItem == null) {
+            throw new ResourceNotFoundException("Product", "productId", productId);
+        }
+
+        cart.setTotalPrice(
+                cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity()));
+        cartItemRepository.deleteCartItemByProductIdAndCartId(cartId, productId);
+
+        return "Product " + cartItem.getProduct().getProductName() + " removed from the cart !!!";
     }
 
-    CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
-    List<CartItem> cartItems = cart.getCartItems();
+    @Override
+    public void updateProductInCarts(Long cartId, Long productId) {
+        Cart cart =
+                cartRepository
+                        .findById(cartId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException("Cart", " cartId", cartId));
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Product", "productId", productId));
 
-    Stream<ProductDTO> productStream =
-        cartItems.stream()
-            .map(
-                item -> {
-                  ProductDTO prod = modelMapper.map(item.getProduct(), ProductDTO.class);
-                  prod.setQuantity(item.getQuantity());
-                  return prod;
-                });
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
+        if (cartItem == null) {
+            throw new APIException(
+                    "Product " + product.getProductName() + " not available in the cart");
+        }
 
-    cartDTO.setProducts(productStream.toList());
-    return cartDTO;
-  }
+        // 1000 - 100*2 = 800 (removing the old price)
+        double cartPrice =
+                cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity());
 
-  @Transactional
-  @Override
-  public String deleteProductFromCart(Long cartId, Long productId) {
-    Cart cart =
-        cartRepository
-            .findById(cartId)
-            .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
-    CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
+        // 200 (new price)
+        cartItem.setProductPrice(product.getSpecialPrice());
 
-    if (cartItem == null) {
-      throw new ResourceNotFoundException("Product", "productId", productId);
+        // 800 + (200*2) = 1200 (adding the price as per the new pricing)
+        cart.setTotalPrice(cartPrice + (cartItem.getProductPrice() * cartItem.getQuantity()));
+
+        cartItem = cartItemRepository.save(cartItem);
     }
 
-    cart.setTotalPrice(
-        cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity()));
-    cartItemRepository.deleteCartItemByProductIdAndCartId(cartId, productId);
+    @Transactional
+    @Override
+    public String createOrUpdateCartWithItems(List<CartItemDTO> cartItems) {
+        // Get user's email
+        String emailId = authUtil.loggedInEmail();
 
-    return "Product " + cartItem.getProduct().getProductName() + " removed from the cart !!!";
-  }
+        // Check if an existing cart is available or create a new one
+        Cart existingCart = cartRepository.findCartByEmail(emailId);
+        if (existingCart == null) {
+            existingCart = new Cart();
+            existingCart.setTotalPrice(0.00);
+            existingCart.setUser(authUtil.loggedInUser());
+            existingCart = cartRepository.save(existingCart);
+        } else {
+            // Clear all current items in the existing cart
+            cartItemRepository.deleteAllByCartId(existingCart.getCartId());
+        }
 
-  @Override
-  public void updateProductInCarts(Long cartId, Long productId) {
-    Cart cart =
-        cartRepository
-            .findById(cartId)
-            .orElseThrow(() -> new ResourceNotFoundException("Cart", " cartId", cartId));
-    Product product =
-        productRepository
-            .findById(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+        double totalPrice = 0.00;
+        // Process each item in the request to add to the cart
+        for (CartItemDTO cartItemDTO : cartItems) {
+            Long productId = cartItemDTO.getProductId();
+            Integer quantity = cartItemDTO.getQuantity();
 
-    CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
-    if (cartItem == null) {
-      throw new APIException("Product " + product.getProductName() + " not available in the cart");
+            // Find the product by ID
+            Product product =
+                    productRepository
+                            .findById(productId)
+                            .orElseThrow(
+                                    () ->
+                                            new ResourceNotFoundException(
+                                                    "Product", "productId", productId));
+
+            // Directly update product stock and total price
+            // product.setQuantity(product.getQuantity() - quantity);
+            totalPrice += product.getSpecialPrice() * quantity;
+
+            // Create and save cart item
+            CartItem cartItem = new CartItem();
+            cartItem.setProduct(product);
+            cartItem.setCart(existingCart);
+            cartItem.setQuantity(quantity);
+            cartItem.setProductPrice(product.getSpecialPrice());
+            cartItem.setDiscount(product.getDiscount());
+            cartItemRepository.save(cartItem);
+        }
+
+        // Update the cart's total price and save
+        existingCart.setTotalPrice(totalPrice);
+        cartRepository.save(existingCart);
+        return "Cart created/updated with the new items successfully";
     }
 
-    // 1000 - 100*2 = 800 (removing the old price)
-    double cartPrice = cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity());
+    private Cart createCart() {
+        Cart userCart = cartRepository.findCartByEmail(authUtil.loggedInEmail());
+        if (userCart != null) {
+            return userCart;
+        }
 
-    // 200 (new price)
-    cartItem.setProductPrice(product.getSpecialPrice());
-
-    // 800 + (200*2) = 1200 (adding the price as per the new pricing)
-    cart.setTotalPrice(cartPrice + (cartItem.getProductPrice() * cartItem.getQuantity()));
-
-    cartItem = cartItemRepository.save(cartItem);
-  }
-
-  @Transactional
-  @Override
-  public String createOrUpdateCartWithItems(List<CartItemDTO> cartItems) {
-    // Get user's email
-    String emailId = authUtil.loggedInEmail();
-
-    // Check if an existing cart is available or create a new one
-    Cart existingCart = cartRepository.findCartByEmail(emailId);
-    if (existingCart == null) {
-      existingCart = new Cart();
-      existingCart.setTotalPrice(0.00);
-      existingCart.setUser(authUtil.loggedInUser());
-      existingCart = cartRepository.save(existingCart);
-    } else {
-      // Clear all current items in the existing cart
-      cartItemRepository.deleteAllByCartId(existingCart.getCartId());
+        Cart cart = new Cart();
+        cart.setTotalPrice(0.00);
+        cart.setUser(authUtil.loggedInUser());
+        Cart newCart = cartRepository.save(cart);
+        return newCart;
     }
-
-    double totalPrice = 0.00;
-    // Process each item in the request to add to the cart
-    for (CartItemDTO cartItemDTO : cartItems) {
-      Long productId = cartItemDTO.getProductId();
-      Integer quantity = cartItemDTO.getQuantity();
-
-      // Find the product by ID
-      Product product =
-          productRepository
-              .findById(productId)
-              .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-
-      // Directly update product stock and total price
-      // product.setQuantity(product.getQuantity() - quantity);
-      totalPrice += product.getSpecialPrice() * quantity;
-
-      // Create and save cart item
-      CartItem cartItem = new CartItem();
-      cartItem.setProduct(product);
-      cartItem.setCart(existingCart);
-      cartItem.setQuantity(quantity);
-      cartItem.setProductPrice(product.getSpecialPrice());
-      cartItem.setDiscount(product.getDiscount());
-      cartItemRepository.save(cartItem);
-    }
-
-    // Update the cart's total price and save
-    existingCart.setTotalPrice(totalPrice);
-    cartRepository.save(existingCart);
-    return "Cart created/updated with the new items successfully";
-  }
-
-  private Cart createCart() {
-    Cart userCart = cartRepository.findCartByEmail(authUtil.loggedInEmail());
-    if (userCart != null) {
-      return userCart;
-    }
-
-    Cart cart = new Cart();
-    cart.setTotalPrice(0.00);
-    cart.setUser(authUtil.loggedInUser());
-    Cart newCart = cartRepository.save(cart);
-    return newCart;
-  }
 }

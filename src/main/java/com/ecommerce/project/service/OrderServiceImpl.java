@@ -24,176 +24,185 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderServiceImpl implements OrderService {
 
-  @Autowired CartRepository cartRepository;
+    @Autowired CartRepository cartRepository;
 
-  @Autowired AddressRepository addressRepository;
+    @Autowired AddressRepository addressRepository;
 
-  @Autowired PaymentRepository paymentRepository;
+    @Autowired PaymentRepository paymentRepository;
 
-  @Autowired OrderRepository orderRepository;
+    @Autowired OrderRepository orderRepository;
 
-  @Autowired OrderItemRepository orderItemRepository;
+    @Autowired OrderItemRepository orderItemRepository;
 
-  @Autowired ProductRepository productRepository;
+    @Autowired ProductRepository productRepository;
 
-  @Autowired CartService cartService;
+    @Autowired CartService cartService;
 
-  @Autowired ModelMapper modelMapper;
+    @Autowired ModelMapper modelMapper;
 
-  @Autowired private AuthUtil authUtil;
+    @Autowired private AuthUtil authUtil;
 
-  @Override
-  @Transactional
-  public OrderDTO placeOrder(
-      String emailId,
-      Long addressId,
-      String paymentMethod,
-      String pgName,
-      String pgPaymentId,
-      String pgStatus,
-      String pgResponseMessage) {
-    // Getting User Cart
-    Cart cart = cartRepository.findCartByEmail(emailId);
-    if (cart == null) {
-      throw new ResourceNotFoundException("Cart", "email", emailId);
+    @Override
+    @Transactional
+    public OrderDTO placeOrder(
+            String emailId,
+            Long addressId,
+            String paymentMethod,
+            String pgName,
+            String pgPaymentId,
+            String pgStatus,
+            String pgResponseMessage) {
+        // Getting User Cart
+        Cart cart = cartRepository.findCartByEmail(emailId);
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart", "email", emailId);
+        }
+
+        Address address =
+                addressRepository
+                        .findById(addressId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Address", "addressId", addressId));
+
+        // Create a new Order with payment Info
+        Order order = new Order();
+        order.setEmail(emailId);
+        order.setOrderDate(LocalDate.now());
+        order.setTotalAmount(cart.getTotalPrice());
+        order.setAddress(address);
+        order.setOrderStatus("Accepted !");
+
+        Payment payment =
+                new Payment(paymentMethod, pgPaymentId, pgStatus, pgResponseMessage, pgName);
+        payment.setOrder(order);
+        payment = paymentRepository.save(payment);
+        order.setPayment(payment);
+
+        Order savedOrder = orderRepository.save(order);
+
+        // Get items from the cart nto the order items
+        List<CartItem> cartItems = cart.getCartItems();
+        if (cartItems.isEmpty()) {
+            throw new APIException("Cart is empty");
+        }
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (CartItem cartItem : cartItems) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProduct(cartItem.getProduct());
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setDiscount(cartItem.getDiscount());
+            orderItem.setOrderedProductPrice(cartItem.getProductPrice());
+            orderItem.setOrder(savedOrder);
+            orderItems.add(orderItem);
+        }
+        orderItems = orderItemRepository.saveAll(orderItems);
+
+        // Update product Stock
+        cart.getCartItems()
+                .forEach(
+                        item -> {
+                            int quantity = item.getQuantity();
+                            Product product = item.getProduct();
+                            product.setQuantity(product.getQuantity() - quantity);
+                            productRepository.save(product);
+
+                            // Clear the cart
+                            cartService.deleteProductFromCart(
+                                    cart.getCartId(), item.getProduct().getProductId());
+                        });
+
+        // Send back the order summary
+        OrderDTO orderDTO = modelMapper.map(savedOrder, OrderDTO.class);
+        orderItems.forEach(
+                item -> orderDTO.getOrderItems().add(modelMapper.map(item, OrderItemDTO.class)));
+
+        orderDTO.setAddressId(addressId);
+        return orderDTO;
     }
 
-    Address address =
-        addressRepository
-            .findById(addressId)
-            .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
+    @Override
+    public OrderResponse getAllOrders(
+            Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Sort sortByAndOrder =
+                sortOrder.equalsIgnoreCase("acs")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
 
-    // Create a new Order with payment Info
-    Order order = new Order();
-    order.setEmail(emailId);
-    order.setOrderDate(LocalDate.now());
-    order.setTotalAmount(cart.getTotalPrice());
-    order.setAddress(address);
-    order.setOrderStatus("Accepted !");
+        Page<Order> pageOrders = orderRepository.findAll(pageDetails);
+        List<Order> orders = pageOrders.getContent();
+        List<OrderDTO> orderDTOs =
+                orders.stream().map(order -> modelMapper.map(order, OrderDTO.class)).toList();
 
-    Payment payment = new Payment(paymentMethod, pgPaymentId, pgStatus, pgResponseMessage, pgName);
-    payment.setOrder(order);
-    payment = paymentRepository.save(payment);
-    order.setPayment(payment);
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setContent(orderDTOs);
+        orderResponse.setPageNumber(pageOrders.getNumber());
+        orderResponse.setPageSize(pageOrders.getSize());
+        orderResponse.setTotalElements(pageOrders.getTotalElements());
+        orderResponse.setTotalPages(pageOrders.getTotalPages());
+        orderResponse.setLastPage(pageOrders.isLast());
 
-    Order savedOrder = orderRepository.save(order);
-
-    // Get items from the cart nto the order items
-    List<CartItem> cartItems = cart.getCartItems();
-    if (cartItems.isEmpty()) {
-      throw new APIException("Cart is empty");
+        return orderResponse;
     }
-    List<OrderItem> orderItems = new ArrayList<>();
-    for (CartItem cartItem : cartItems) {
-      OrderItem orderItem = new OrderItem();
-      orderItem.setProduct(cartItem.getProduct());
-      orderItem.setQuantity(cartItem.getQuantity());
-      orderItem.setDiscount(cartItem.getDiscount());
-      orderItem.setOrderedProductPrice(cartItem.getProductPrice());
-      orderItem.setOrder(savedOrder);
-      orderItems.add(orderItem);
+
+    @Override
+    public OrderDTO updateOrder(Long orderId, String status) {
+        Order order =
+                orderRepository
+                        .findById(orderId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException("Order", "orderId", orderId));
+
+        order.setOrderStatus(status);
+        orderRepository.save(order);
+        return modelMapper.map(order, OrderDTO.class);
     }
-    orderItems = orderItemRepository.saveAll(orderItems);
 
-    // Update product Stock
-    cart.getCartItems()
-        .forEach(
-            item -> {
-              int quantity = item.getQuantity();
-              Product product = item.getProduct();
-              product.setQuantity(product.getQuantity() - quantity);
-              productRepository.save(product);
+    @Override
+    public OrderResponse getAllSellerOrders(
+            Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Sort sortByAndOrder =
+                sortOrder.equalsIgnoreCase("acs")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
 
-              // Clear the cart
-              cartService.deleteProductFromCart(cart.getCartId(), item.getProduct().getProductId());
-            });
+        User seller = authUtil.loggedInUser();
 
-    // Send back the order summary
-    OrderDTO orderDTO = modelMapper.map(savedOrder, OrderDTO.class);
-    orderItems.forEach(
-        item -> orderDTO.getOrderItems().add(modelMapper.map(item, OrderItemDTO.class)));
+        Page<Order> pageOrders = orderRepository.findAll(pageDetails);
+        List<Order> sellerOrders =
+                pageOrders.getContent().stream()
+                        .filter(
+                                order ->
+                                        order.getOrderItems().stream()
+                                                .anyMatch(
+                                                        orderItem -> {
+                                                            var product = orderItem.getProduct();
+                                                            if (product == null
+                                                                    || product.getUser() == null) {
+                                                                return false;
+                                                            }
+                                                            return product.getUser()
+                                                                    .getUserId()
+                                                                    .equals(seller.getUserId());
+                                                        }))
+                        .toList();
+        // we are filtering orders which have at least one order item which belongs to the logged in
+        // seller
 
-    orderDTO.setAddressId(addressId);
-    return orderDTO;
-  }
+        List<OrderDTO> orderDTOs =
+                sellerOrders.stream().map(order -> modelMapper.map(order, OrderDTO.class)).toList();
 
-  @Override
-  public OrderResponse getAllOrders(
-      Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-    Sort sortByAndOrder =
-        sortOrder.equalsIgnoreCase("acs")
-            ? Sort.by(sortBy).ascending()
-            : Sort.by(sortBy).descending();
-    Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setContent(orderDTOs);
+        orderResponse.setPageNumber(pageOrders.getNumber());
+        orderResponse.setPageSize(pageOrders.getSize());
+        orderResponse.setTotalElements(pageOrders.getTotalElements());
+        orderResponse.setTotalPages(pageOrders.getTotalPages());
+        orderResponse.setLastPage(pageOrders.isLast());
 
-    Page<Order> pageOrders = orderRepository.findAll(pageDetails);
-    List<Order> orders = pageOrders.getContent();
-    List<OrderDTO> orderDTOs =
-        orders.stream().map(order -> modelMapper.map(order, OrderDTO.class)).toList();
-
-    OrderResponse orderResponse = new OrderResponse();
-    orderResponse.setContent(orderDTOs);
-    orderResponse.setPageNumber(pageOrders.getNumber());
-    orderResponse.setPageSize(pageOrders.getSize());
-    orderResponse.setTotalElements(pageOrders.getTotalElements());
-    orderResponse.setTotalPages(pageOrders.getTotalPages());
-    orderResponse.setLastPage(pageOrders.isLast());
-
-    return orderResponse;
-  }
-
-  @Override
-  public OrderDTO updateOrder(Long orderId, String status) {
-    Order order =
-        orderRepository
-            .findById(orderId)
-            .orElseThrow(() -> new ResourceNotFoundException("Order", "orderId", orderId));
-
-    order.setOrderStatus(status);
-    orderRepository.save(order);
-    return modelMapper.map(order, OrderDTO.class);
-  }
-
-  @Override
-  public OrderResponse getAllSellerOrders(
-      Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-    Sort sortByAndOrder =
-        sortOrder.equalsIgnoreCase("acs")
-            ? Sort.by(sortBy).ascending()
-            : Sort.by(sortBy).descending();
-    Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
-
-    User seller = authUtil.loggedInUser();
-
-    Page<Order> pageOrders = orderRepository.findAll(pageDetails);
-    List<Order> sellerOrders =
-        pageOrders.getContent().stream()
-            .filter(
-                order ->
-                    order.getOrderItems().stream()
-                        .anyMatch(
-                            orderItem -> {
-                              var product = orderItem.getProduct();
-                              if (product == null || product.getUser() == null) {
-                                return false;
-                              }
-                              return product.getUser().getUserId().equals(seller.getUserId());
-                            }))
-            .toList();
-    // we are filtering orders which have at least one order item which belongs to the logged in
-    // seller
-
-    List<OrderDTO> orderDTOs =
-        sellerOrders.stream().map(order -> modelMapper.map(order, OrderDTO.class)).toList();
-
-    OrderResponse orderResponse = new OrderResponse();
-    orderResponse.setContent(orderDTOs);
-    orderResponse.setPageNumber(pageOrders.getNumber());
-    orderResponse.setPageSize(pageOrders.getSize());
-    orderResponse.setTotalElements(pageOrders.getTotalElements());
-    orderResponse.setTotalPages(pageOrders.getTotalPages());
-    orderResponse.setLastPage(pageOrders.isLast());
-
-    return orderResponse;
-  }
+        return orderResponse;
+    }
 }

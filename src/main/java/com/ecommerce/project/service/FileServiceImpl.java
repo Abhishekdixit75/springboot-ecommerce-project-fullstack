@@ -10,25 +10,25 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FileServiceImpl implements FileService {
-  @Override
-  public String uploadImage(String path, MultipartFile file) throws IOException {
-    // Filename of the current/original file
-    String originalFileName = file.getOriginalFilename();
+    @Override
+    public String uploadImage(String path, MultipartFile file) throws IOException {
+        // Filename of the current/original file
+        String originalFileName = file.getOriginalFilename();
 
-    // Generate a unique filename
-    String randomId = UUID.randomUUID().toString();
-    String filename =
-        randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
-    String filePath = path + File.separator + filename;
+        // Generate a unique filename
+        String randomId = UUID.randomUUID().toString();
+        String filename =
+                randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
+        String filePath = path + File.separator + filename;
 
-    // check if path exist and create
-    File folder = new File(path);
-    if (!folder.exists()) folder.mkdir();
+        // check if path exist and create
+        File folder = new File(path);
+        if (!folder.exists()) folder.mkdir();
 
-    // upload to server
-    Files.copy(file.getInputStream(), Paths.get(filePath));
+        // upload to server
+        Files.copy(file.getInputStream(), Paths.get(filePath));
 
-    // return the file
-    return filename;
-  }
+        // return the file
+        return filename;
+    }
 }

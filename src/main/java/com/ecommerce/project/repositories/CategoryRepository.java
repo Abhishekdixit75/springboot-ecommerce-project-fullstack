@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CategoryRepository
-    extends JpaRepository<
-        Category, Long> { // the type parameters are <for the @entity class , for the type of @Id>
-  Category findByCategoryName(String categoryName);
+        extends JpaRepository<
+                Category,
+                Long> { // the type parameters are <for the @entity class , for the type of @Id>
+    Category findByCategoryName(String categoryName);
 }

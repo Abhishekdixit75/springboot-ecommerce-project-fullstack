@@ -9,8 +9,8 @@ cd ecom-frontend || { echo "❌ ecom-frontend folder not found!"; exit 1; }
 npm run lint || { echo "❌ Frontend lint failed! Run 'npm run lint:fix' to fix."; exit 1; }
 cd ..
 
-# Backend full lint
-echo "☕ Linting Backend (Checkstyle)..."
-./mvnw checkstyle:check || { echo "❌ Backend Checkstyle failed! Run './mvnw spotless:apply' to fix."; exit 1; }
+# Backend verification (Full Project)
+echo "☕ Verifying Backend Formatting..."
+./mvnw spotless:check || { echo "❌ Backend formatting check failed! Run './mvnw spotless:apply' to fix."; exit 1; }
 
 echo "✨ All clear! Pushing to remote..."

@@ -8,6 +8,6 @@ import org.springframework.http.ResponseCookie;
 @Data
 @AllArgsConstructor
 public class AuthenticationResult {
-  private final UserInfoResponse response;
-  private final ResponseCookie jwtCookie;
+    private final UserInfoResponse response;
+    private final ResponseCookie jwtCookie;
 }
