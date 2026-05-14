@@ -13,6 +13,8 @@ import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.repositories.CartRepository;
 import com.ecommerce.project.repositories.CategoryRepository;
 import com.ecommerce.project.repositories.ProductRepository;
+import com.ecommerce.project.util.AuthUtil;
+import com.ecommerce.project.model.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +40,8 @@ class ProductServiceImplTest {
     @Mock // mock annotation is used for creating the dependency of the class which we want to test
     private FileService fileService;
 
+    @Mock private AuthUtil authUtil;
+
     @InjectMocks
     // and this is used to create the instance of the class which we want to test and inject the
     // mocked dependencies into it
@@ -46,10 +50,15 @@ class ProductServiceImplTest {
     private Category category;
     private Product product;
     private ProductDTO productDTO;
+    private User user;
 
     @BeforeEach
     void setUp() {
         // Initialize test data
+        user = new User();
+        user.setUserId(1L);
+        user.setUserName("testuser");
+        user.setEmail("testuser@example.com");
         category = new Category();
         category.setCategoryId(1L);
         category.setCategoryName("Electronics");
@@ -70,6 +79,8 @@ class ProductServiceImplTest {
         productDTO.setPrice(50000);
         productDTO.setDiscount(10);
         productDTO.setQuantity(100);
+
+        lenient().when(authUtil.loggedInUser()).thenReturn(user);
     }
 
     @Test
