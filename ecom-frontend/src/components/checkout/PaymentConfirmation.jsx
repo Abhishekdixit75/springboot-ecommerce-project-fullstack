@@ -28,7 +28,7 @@ const PaymentConfirmation = () => {
          cart.length > 0
       ) {
          const sendData = {
-            addressId: selectedUserCheckoutAddress.addressId,
+            addressId: selectedUserCheckoutAddress?.addressId || null,
             pgName: 'stripe',
             pgPaymentId: paymentIntent,
             pgStatus: 'succeeded',

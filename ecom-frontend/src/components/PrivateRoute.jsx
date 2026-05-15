@@ -24,10 +24,9 @@ const PrivateRoute = ({ publicPage = false, adminOnly = false }) => {
             return <Navigate to="/" replace />;
          }
       }
-   }
-
-   if (!isAdmin && !isSeller) {
-      return <Navigate to="/login" />;
+      if (!isAdmin && !isSeller) {
+         return <Navigate to="/login" />;
+      }
    }
 
    return user ? <Outlet /> : <Navigate to="/login" />;

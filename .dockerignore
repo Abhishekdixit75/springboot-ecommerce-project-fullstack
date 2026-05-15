@@ -1,0 +1,7 @@
+.git
+.idea
+.vscode
+.env
+ecom-frontend/node_modules
+target/*
+!target/*.jar
